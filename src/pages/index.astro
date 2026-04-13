@@ -34,15 +34,26 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
       <h2 class="text-3xl font-bold text-amber text-center mb-2">On Tap Now</h2>
       <p class="text-center text-warm-gray text-sm mb-10">Updated live. What you see is what's pouring.</p>
       <div class="grid gap-3">
-        {TAP_LIST.map((beer) => (
-          <div class={`flex items-center justify-between rounded-lg border px-5 py-4 ${beer.status === 'low' ? 'border-amber/50 bg-amber/5' : 'border-warm-gray/20 bg-dark-lighter'}`}>
-            <div>
-              <h3 class="font-bold text-warm-light">{beer.name}</h3>
-              <p class="text-sm text-warm-gray">{beer.style}</p>
+        {TAP_LIST.map((beer, i) => (
+          <div class={`rounded-lg border ${beer.status === 'low' ? 'border-amber/50 bg-amber/5' : 'border-warm-gray/20 bg-dark-lighter'}`}>
+            <div class="flex items-center justify-between px-5 py-4 cursor-pointer select-none" data-tap-toggle={i}>
+              <div>
+                <h3 class="font-bold text-warm-light">{beer.name}</h3>
+                <p class="text-sm text-warm-gray">{beer.style}</p>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-sm font-mono text-amber">{beer.abv}</span>
+                {beer.status === 'low' && <span class="text-xs bg-amber/20 text-amber px-2 py-0.5 rounded-full">Last Keg</span>}
+                <span class="text-warm-gray text-xs transition-transform" data-tap-arrow={i}>&#9662;</span>
+              </div>
             </div>
-            <div class="flex items-center gap-4">
-              <span class="text-sm font-mono text-amber">{beer.abv}</span>
-              {beer.status === 'low' && <span class="text-xs bg-amber/20 text-amber px-2 py-0.5 rounded-full">Last Keg</span>}
+            <div class="hidden px-5 pb-4" data-tap-detail={i}>
+              <div class="border-t border-warm-gray/15 pt-3 flex flex-wrap gap-4 text-sm">
+                <span class="text-warm-gray"><span class="text-warm-light font-medium">ABV:</span> {beer.abv}</span>
+                <span class="text-warm-gray"><span class="text-warm-light font-medium">IBU:</span> {beer.ibu}</span>
+                <span class="text-warm-gray"><span class="text-warm-light font-medium">Style:</span> {beer.style}</span>
+              </div>
+              <p class="text-sm text-warm-gray mt-2 leading-relaxed">{beer.notes}</p>
             </div>
           </div>
         ))}
@@ -55,14 +66,21 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
     <div class="mx-auto max-w-4xl">
       <h2 class="text-3xl font-bold text-amber text-center mb-10">What's Happening</h2>
       <div class="grid md:grid-cols-2 gap-4">
-        {EVENTS.map((event) => (
-          <div class="rounded-xl border border-warm-gray/20 bg-dark p-6">
-            <div class="flex items-start justify-between mb-3">
-              <h3 class="font-bold text-warm-light text-lg">{event.name}</h3>
-              <span class="text-xs bg-amber/20 text-amber px-2 py-1 rounded-full whitespace-nowrap">{event.time}</span>
+        {EVENTS.map((event, i) => (
+          <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
+            <div class="p-6 cursor-pointer select-none" data-event-toggle={i}>
+              <div class="flex items-start justify-between mb-3">
+                <h3 class="font-bold text-warm-light text-lg">{event.name}</h3>
+                <span class="text-xs bg-amber/20 text-amber px-2 py-1 rounded-full whitespace-nowrap">{event.time}</span>
+              </div>
+              <p class="text-sm text-amber">{event.day}</p>
             </div>
-            <p class="text-sm text-amber mb-2">{event.day}</p>
-            <p class="text-sm text-warm-gray">{event.description}</p>
+            <div class="hidden px-6 pb-6" data-event-detail={i}>
+              <div class="border-t border-warm-gray/15 pt-3">
+                <p class="text-sm text-warm-gray">{event.description}</p>
+                <a href="#private-events" class="inline-block mt-3 text-xs text-amber hover:text-amber-light transition-colors">Book this event &rarr;</a>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -94,32 +112,44 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
           <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=400&q=80" alt="Brewery t-shirt" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Copper Rail Logo Tee</p>
-            <p class="text-amber text-sm font-bold mt-1">$28</p>
+            <div class="flex items-center justify-between mt-1">
+              <p class="text-amber text-sm font-bold">$28</p>
+              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
+            </div>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80" alt="Brewery hat" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Snapback Hat</p>
-            <p class="text-amber text-sm font-bold mt-1">$32</p>
+            <div class="flex items-center justify-between mt-1">
+              <p class="text-amber text-sm font-bold">$32</p>
+              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
+            </div>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1577003811926-53b288a6e5d0?w=400&q=80" alt="Pint glass" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Copper Rail Pint Glass</p>
-            <p class="text-amber text-sm font-bold mt-1">$12</p>
+            <div class="flex items-center justify-between mt-1">
+              <p class="text-amber text-sm font-bold">$12</p>
+              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
+            </div>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&q=80" alt="Brewery hoodie" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Pullover Hoodie</p>
-            <p class="text-amber text-sm font-bold mt-1">$48</p>
+            <div class="flex items-center justify-between mt-1">
+              <p class="text-amber text-sm font-bold">$48</p>
+              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
+            </div>
           </div>
         </div>
       </div>
-      <p class="text-center text-warm-gray text-xs mt-6">Online ordering coming soon. Available in the taproom now.</p>
+      <p class="text-center text-warm-gray text-xs mt-6">All merch available at the taproom. Stop by and grab yours.</p>
     </div>
   </section>
 
@@ -235,6 +265,26 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   </section>
 
   <script>
+    // Tap list expand/collapse
+    document.querySelectorAll('[data-tap-toggle]').forEach(el => {
+      el.addEventListener('click', () => {
+        const idx = (el as HTMLElement).dataset.tapToggle
+        const detail = document.querySelector(`[data-tap-detail="${idx}"]`)
+        const arrow = document.querySelector(`[data-tap-arrow="${idx}"]`)
+        if (detail) detail.classList.toggle('hidden')
+        if (arrow) arrow.classList.toggle('rotate-180')
+      })
+    })
+
+    // Events expand/collapse
+    document.querySelectorAll('[data-event-toggle]').forEach(el => {
+      el.addEventListener('click', () => {
+        const idx = (el as HTMLElement).dataset.eventToggle
+        const detail = document.querySelector(`[data-event-detail="${idx}"]`)
+        if (detail) detail.classList.toggle('hidden')
+      })
+    })
+
     document.getElementById('event-form')?.addEventListener('submit', (e) => {
       e.preventDefault()
       const status = document.getElementById('form-status')!
