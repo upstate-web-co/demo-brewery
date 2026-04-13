@@ -339,7 +339,16 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
       bubble.className = role === 'user'
         ? 'bg-amber text-dark rounded-2xl rounded-br-sm px-4 py-2 max-w-[80%] text-sm font-medium'
         : 'bg-dark-lighter text-warm-light rounded-2xl rounded-bl-sm px-4 py-2 max-w-[80%] text-sm leading-relaxed border border-warm-gray/15'
-      bubble.textContent = text
+      if (role === 'assistant') {
+        const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        const html = escaped.replace(/\[\[ADD:([^:]+):([^\]]+)\]\]/g, (_, name, price) => {
+          const safeName = name.replace(/'/g, "\\'")
+          return `<button onclick="(window).addToCart('${safeName}', '${price}')" class="inline-block mt-1 px-3 py-1 rounded-lg bg-amber/20 text-amber text-xs font-bold hover:bg-amber/30 transition-colors">+ Add ${name} to cart</button>`
+        })
+        bubble.innerHTML = html
+      } else {
+        bubble.textContent = text
+      }
       wrapper.appendChild(bubble)
       chatMessages.appendChild(wrapper)
       chatMessages.scrollTop = chatMessages.scrollHeight

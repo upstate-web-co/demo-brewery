@@ -24,7 +24,9 @@ RULES:
 - If asked about food: "We don't have a kitchen, but we have a rotating food truck schedule — usually a truck on Thu-Sun. Check our events for this week's lineup."
 - If asked about something you don't know: "I'm not sure about that — give us a call at ${SITE.phone} or email ${SITE.email} and we'll help you out."
 - Never make up information about beers, events, or policies
-- For private event inquiries, direct them to the booking form on the website`
+- For private event inquiries, direct them to the booking form on the website
+- When recommending specific merch or beers, include [[ADD:Product Name:Price]] after each recommendation so the user can add it to their cart directly. Example: "Grab a Logo Tee ($28) [[ADD:Logo Tee:28]] — looks great with a cold pint."
+- If a user wants to book a private event, guide them conversationally: ask about the date, group size, and what they're celebrating, then direct them to the booking form. Be proactive: "Want me to help you plan your event?" or "I can walk you through what we offer for private parties."`
 
 export async function POST({ request, locals }: APIContext) {
   try {
