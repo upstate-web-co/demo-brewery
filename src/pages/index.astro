@@ -1,0 +1,272 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { SITE, TAP_LIST, EVENTS } from '../lib/config'
+---
+
+<Layout>
+  <!-- Hero -->
+  <section class="relative h-[70vh] flex items-center justify-center overflow-hidden">
+    <img src="https://images.unsplash.com/photo-1559526324-593bc073d938?w=1600&q=80" alt="Brewery taproom" class="absolute inset-0 w-full h-full object-cover brightness-[0.3]" loading="eager" />
+    <div class="relative text-center px-6">
+      <h1 class="text-5xl md:text-7xl font-bold text-cream tracking-tight">{SITE.name}</h1>
+      <p class="mt-4 text-xl md:text-2xl text-amber-light">{SITE.tagline}</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="#taplist" class="rounded-lg bg-amber px-6 py-3 text-base font-medium text-dark hover:bg-amber-light transition-colors">What's On Tap</a>
+        <a href="#private-events" class="rounded-lg border border-amber/50 px-6 py-3 text-base font-medium text-amber hover:bg-amber/10 transition-colors">Book the Taproom</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inline AI Ask Bar -->
+  <section class="bg-dark-lighter py-6 px-6">
+    <div class="mx-auto max-w-xl">
+      <div class="flex gap-2">
+        <input id="ai-ask" type="text" placeholder="What's on tap? Are you open right now? Do you host private events?" class="flex-1 rounded-lg bg-dark border border-warm-gray/30 px-5 py-3 text-sm text-warm-light placeholder:text-warm-gray focus:border-amber focus:outline-none" />
+        <button id="ai-send" class="rounded-lg bg-amber px-5 py-3 text-sm font-medium text-dark hover:bg-amber-light transition-colors">Ask</button>
+      </div>
+      <div id="ai-response" class="hidden mt-3 rounded-lg bg-dark border border-warm-gray/20 p-4 text-sm text-warm-light leading-relaxed"></div>
+    </div>
+  </section>
+
+  <!-- Tap List -->
+  <section id="taplist" class="py-20 px-6">
+    <div class="mx-auto max-w-4xl">
+      <h2 class="text-3xl font-bold text-amber text-center mb-2">On Tap Now</h2>
+      <p class="text-center text-warm-gray text-sm mb-10">Updated live. What you see is what's pouring.</p>
+      <div class="grid gap-3">
+        {TAP_LIST.map((beer) => (
+          <div class={`flex items-center justify-between rounded-lg border px-5 py-4 ${beer.status === 'low' ? 'border-amber/50 bg-amber/5' : 'border-warm-gray/20 bg-dark-lighter'}`}>
+            <div>
+              <h3 class="font-bold text-warm-light">{beer.name}</h3>
+              <p class="text-sm text-warm-gray">{beer.style}</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-sm font-mono text-amber">{beer.abv}</span>
+              {beer.status === 'low' && <span class="text-xs bg-amber/20 text-amber px-2 py-0.5 rounded-full">Last Keg</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Events -->
+  <section id="events" class="py-20 px-6 bg-dark-lighter">
+    <div class="mx-auto max-w-4xl">
+      <h2 class="text-3xl font-bold text-amber text-center mb-10">What's Happening</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        {EVENTS.map((event) => (
+          <div class="rounded-xl border border-warm-gray/20 bg-dark p-6">
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-bold text-warm-light text-lg">{event.name}</h3>
+              <span class="text-xs bg-amber/20 text-amber px-2 py-1 rounded-full whitespace-nowrap">{event.time}</span>
+            </div>
+            <p class="text-sm text-amber mb-2">{event.day}</p>
+            <p class="text-sm text-warm-gray">{event.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section class="py-20 px-6">
+    <div class="mx-auto max-w-6xl">
+      <h2 class="text-3xl font-bold text-amber text-center mb-10">The Taproom</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <img src="https://images.unsplash.com/photo-1532634922-8fe0b757fb13?w=600&q=80" alt="Beer taps" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&q=80" alt="Taproom interior" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&q=80" alt="Craft beer flight" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1575037614876-c38a4c44a024?w=600&q=80" alt="Brewery equipment" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1584225064536-d0fbc0a10f18?w=600&q=80" alt="People at taproom" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=600&q=80" alt="Beer pouring" class="rounded-lg aspect-square object-cover" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Merch Shop -->
+  <section id="merch" class="py-20 px-6 bg-dark-lighter">
+    <div class="mx-auto max-w-4xl">
+      <h2 class="text-3xl font-bold text-amber text-center mb-3">Merch</h2>
+      <p class="text-center text-warm-gray text-sm mb-10">Rep the Rail. All merch ships free within SC.</p>
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=400&q=80" alt="Brewery t-shirt" class="aspect-square object-cover w-full" loading="lazy" />
+          <div class="p-4">
+            <p class="font-medium text-warm-light text-sm">Iron Rail Logo Tee</p>
+            <p class="text-amber text-sm font-bold mt-1">$28</p>
+          </div>
+        </div>
+        <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80" alt="Brewery hat" class="aspect-square object-cover w-full" loading="lazy" />
+          <div class="p-4">
+            <p class="font-medium text-warm-light text-sm">Snapback Hat</p>
+            <p class="text-amber text-sm font-bold mt-1">$32</p>
+          </div>
+        </div>
+        <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1577003811926-53b288a6e5d0?w=400&q=80" alt="Pint glass" class="aspect-square object-cover w-full" loading="lazy" />
+          <div class="p-4">
+            <p class="font-medium text-warm-light text-sm">Iron Rail Pint Glass</p>
+            <p class="text-amber text-sm font-bold mt-1">$12</p>
+          </div>
+        </div>
+        <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&q=80" alt="Brewery hoodie" class="aspect-square object-cover w-full" loading="lazy" />
+          <div class="p-4">
+            <p class="font-medium text-warm-light text-sm">Pullover Hoodie</p>
+            <p class="text-amber text-sm font-bold mt-1">$48</p>
+          </div>
+        </div>
+      </div>
+      <p class="text-center text-warm-gray text-xs mt-6">Online ordering coming soon. Available in the taproom now.</p>
+    </div>
+  </section>
+
+  <!-- Beer Finder -->
+  <section id="find-our-beer" class="py-20 px-6">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 class="text-3xl font-bold text-amber mb-3">Find Our Beer</h2>
+      <p class="text-warm-gray text-sm mb-8">Can't make it to the taproom? Find Iron Rail at these locations.</p>
+      <div class="grid sm:grid-cols-2 gap-3 text-left">
+        <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
+          <p class="font-medium text-warm-light text-sm">GreenVille Beer Exchange</p>
+          <p class="text-xs text-warm-gray">24 S Main St — Growler fills + cans</p>
+        </div>
+        <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
+          <p class="font-medium text-warm-light text-sm">Whole Foods Market</p>
+          <p class="text-xs text-warm-gray">1140 Woodruff Rd — 6-packs</p>
+        </div>
+        <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
+          <p class="font-medium text-warm-light text-sm">The Publican</p>
+          <p class="text-xs text-warm-gray">300 Augusta St — Draft only</p>
+        </div>
+        <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
+          <p class="font-medium text-warm-light text-sm">Community Tap</p>
+          <p class="text-xs text-warm-gray">217 Greenville St, Pendleton — Cans + draft</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Private Events -->
+  <section id="private-events" class="py-20 px-6 bg-dark-lighter">
+    <div class="mx-auto max-w-2xl">
+      <h2 class="text-3xl font-bold text-amber text-center mb-3">Book the Taproom</h2>
+      <p class="text-center text-warm-gray text-sm mb-10">Birthdays, corporate events, rehearsal dinners, release parties. Capacity: 80 seated, 120 standing.</p>
+
+      <form id="event-form" class="space-y-4">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-warm-light mb-1">Your Name</label>
+            <input type="text" name="name" required class="w-full bg-dark rounded-lg border border-warm-gray/30 px-4 py-2.5 text-sm text-warm-light focus:border-amber focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-warm-light mb-1">Email</label>
+            <input type="email" name="email" required class="w-full bg-dark rounded-lg border border-warm-gray/30 px-4 py-2.5 text-sm text-warm-light focus:border-amber focus:outline-none" />
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-warm-light mb-1">Event Date</label>
+            <input type="date" name="date" required class="w-full bg-dark rounded-lg border border-warm-gray/30 px-4 py-2.5 text-sm text-warm-light focus:border-amber focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-warm-light mb-1">Expected Guests</label>
+            <select name="guests" required class="w-full bg-dark rounded-lg border border-warm-gray/30 px-4 py-2.5 text-sm text-warm-light focus:border-amber focus:outline-none">
+              <option value="">Select...</option>
+              <option value="under-20">Under 20</option>
+              <option value="20-50">20–50</option>
+              <option value="50-80">50–80</option>
+              <option value="80-120">80–120</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-warm-light mb-1">Event Type</label>
+          <select name="event_type" required class="w-full bg-dark rounded-lg border border-warm-gray/30 px-4 py-2.5 text-sm text-warm-light focus:border-amber focus:outline-none">
+            <option value="">Select...</option>
+            <option value="birthday">Birthday Party</option>
+            <option value="corporate">Corporate Event</option>
+            <option value="rehearsal">Rehearsal Dinner</option>
+            <option value="release">Beer Release Party</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-warm-light mb-1">Tell us about your event</label>
+          <textarea name="details" rows="3" class="w-full bg-dark rounded-lg border border-warm-gray/30 px-4 py-2.5 text-sm text-warm-light focus:border-amber focus:outline-none"></textarea>
+        </div>
+        <button type="submit" class="w-full rounded-lg bg-amber px-6 py-3 font-medium text-dark hover:bg-amber-light transition-colors">
+          Request a Quote
+        </button>
+        <div id="form-status" class="hidden rounded-lg p-3 text-center text-sm"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Visit -->
+  <section id="visit" class="py-20 px-6">
+    <div class="mx-auto max-w-4xl">
+      <h2 class="text-3xl font-bold text-amber text-center mb-10">Visit Us</h2>
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <p class="text-warm-light text-lg mb-4">{SITE.address}</p>
+          <p class="text-warm-gray text-sm mb-1">Walk-ins welcome. No reservations needed for the taproom.</p>
+          <p class="text-warm-gray text-sm mb-6">Dogs welcome on the patio. Kids welcome until 8pm.</p>
+          <div class="space-y-1 text-sm text-warm-gray">
+            <p><span class="text-warm-light font-medium">Tue–Wed:</span> 4pm–10pm</p>
+            <p><span class="text-warm-light font-medium">Thu:</span> 4pm–11pm</p>
+            <p><span class="text-warm-light font-medium">Fri:</span> 2pm–12am</p>
+            <p><span class="text-warm-light font-medium">Sat:</span> 12pm–12am</p>
+            <p><span class="text-warm-light font-medium">Sun:</span> 12pm–8pm</p>
+            <p><span class="text-warm-light font-medium">Mon:</span> Closed</p>
+          </div>
+          <div class="mt-6">
+            <a href={`tel:${SITE.phone}`} class="text-amber hover:text-amber-light">{SITE.phone}</a>
+          </div>
+        </div>
+        <div class="rounded-xl overflow-hidden aspect-video bg-dark-lighter flex items-center justify-center text-warm-gray text-sm">
+          <!-- Google Maps embed placeholder -->
+          <img src="https://images.unsplash.com/photo-1567696911980-2eed69a46042?w=600&q=80" alt="Brewery exterior" class="w-full h-full object-cover" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.getElementById('event-form')?.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const status = document.getElementById('form-status')!
+      status.textContent = 'Thanks! We\'ll get back to you within 24 hours with a quote.'
+      status.className = 'rounded-lg bg-amber/10 border border-amber/30 p-3 text-center text-sm text-amber'
+      ;(e.target as HTMLFormElement).querySelectorAll('input, select, textarea, button').forEach(el => (el as HTMLInputElement).disabled = true)
+    })
+
+    // Inline AI ask
+    const aiInput = document.getElementById('ai-ask') as HTMLInputElement
+    const aiSend = document.getElementById('ai-send')!
+    const aiResponse = document.getElementById('ai-response')!
+
+    async function askAI() {
+      const text = aiInput.value.trim()
+      if (!text) return
+      aiResponse.textContent = 'Thinking...'
+      aiResponse.classList.remove('hidden')
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text }),
+        })
+        const data = await res.json()
+        aiResponse.textContent = data.reply || 'Couldn\'t find an answer — give us a call!'
+      } catch {
+        aiResponse.textContent = 'Something went wrong. Call us at (864) 555-2739!'
+      }
+    }
+
+    aiSend.addEventListener('click', askAI)
+    aiInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askAI() })
+  </script>
+</Layout>

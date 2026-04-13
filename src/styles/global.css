@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-amber: #D97706;
+  --color-amber-light: #FBBF24;
+  --color-amber-dark: #B45309;
+  --color-dark: #1C1917;
+  --color-dark-lighter: #292524;
+  --color-warm-gray: #78716C;
+  --color-warm-light: #F5F5F4;
+  --color-cream: #FAFAF9;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Georgia', 'Times New Roman', serif; }
+h1, h2, h3, h4 { font-family: system-ui, -apple-system, sans-serif; }

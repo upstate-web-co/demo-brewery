@@ -1,0 +1,85 @@
+---
+import '../styles/global.css'
+import { SITE } from '../lib/config'
+
+interface Props {
+  title?: string
+  description?: string
+}
+
+const { title = `${SITE.name} — ${SITE.tagline}`, description = `${SITE.tagline} Craft brewery and taproom in Greenville, SC.` } = Astro.props
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+</head>
+<body class="bg-dark text-cream antialiased">
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-dark/95 backdrop-blur-sm border-b border-warm-gray/20">
+    <div class="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
+      <a href="/" class="text-xl font-bold text-amber">{SITE.name}</a>
+      <div class="hidden md:flex items-center gap-6 text-sm">
+        <a href="#taplist" class="text-warm-light/70 hover:text-amber transition-colors">On Tap</a>
+        <a href="#events" class="text-warm-light/70 hover:text-amber transition-colors">Events</a>
+        <a href="#private-events" class="text-warm-light/70 hover:text-amber transition-colors">Private Events</a>
+        <a href="#visit" class="text-warm-light/70 hover:text-amber transition-colors">Visit</a>
+        <a href="#contact" class="rounded-lg bg-amber px-4 py-2 font-medium text-dark hover:bg-amber-light transition-colors">Book the Taproom</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-16">
+    <slot />
+  </main>
+
+  <!-- Demo Disclaimer -->
+  <div class="bg-yellow-50 border-y border-yellow-200 py-3 px-6 text-center">
+    <p class="text-xs text-yellow-800">
+      <strong>Portfolio Demo</strong> — This is a sample site built by <a href="https://upstate-web.com" class="underline hover:text-yellow-900">Upstate Web Co</a> to showcase what we build for this industry. This is not a real business.
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-warm-gray/20 bg-dark-lighter">
+    <div class="mx-auto max-w-6xl px-6 py-10">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <p class="text-lg font-bold text-amber">{SITE.name}</p>
+          <p class="text-sm text-warm-gray mt-2">{SITE.tagline}</p>
+        </div>
+        <div class="text-sm text-warm-gray">
+          <p class="font-medium text-warm-light mb-2">Hours</p>
+          <p>Tue–Wed: 4pm–10pm</p>
+          <p>Thu: 4pm–11pm</p>
+          <p>Fri: 2pm–12am</p>
+          <p>Sat: 12pm–12am</p>
+          <p>Sun: 12pm–8pm</p>
+          <p>Mon: Closed</p>
+        </div>
+        <div class="text-sm text-warm-gray">
+          <p class="font-medium text-warm-light mb-2">Contact</p>
+          <p>{SITE.address}</p>
+          <p class="mt-1">{SITE.phone}</p>
+          <p><a href={`mailto:${SITE.email}`} class="hover:text-amber">{SITE.email}</a></p>
+        </div>
+      </div>
+      <div class="mt-8 pt-6 border-t border-warm-gray/20 text-center text-xs text-warm-gray">
+        &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
+        <span class="mx-2">|</span>
+        <span>Built by <a href="https://upstate-web.com" class="text-amber hover:underline">Upstate Web Co</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Inline AI: contextual search bar on homepage, not a floating bubble -->
+</body>
+</html>
