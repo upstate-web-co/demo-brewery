@@ -183,7 +183,23 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <section id="private-events" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-2xl">
       <h2 class="text-3xl font-bold text-amber text-center mb-3">Book the Taproom</h2>
-      <p class="text-center text-warm-gray text-sm mb-10">Birthdays, corporate events, rehearsal dinners, release parties. Capacity: 80 seated, 120 standing.</p>
+      <p class="text-center text-warm-gray text-sm mb-6">Birthdays, corporate events, rehearsal dinners, release parties. Capacity: 80 seated, 120 standing.</p>
+
+      <!-- Highlights -->
+      <div class="grid grid-cols-3 gap-3 mb-10">
+        <div class="rounded-lg bg-dark border border-warm-gray/20 p-4 text-center">
+          <p class="text-2xl font-bold text-amber">120</p>
+          <p class="text-xs text-warm-gray mt-1">Max Capacity</p>
+        </div>
+        <div class="rounded-lg bg-dark border border-warm-gray/20 p-4 text-center">
+          <p class="text-2xl font-bold text-amber">8</p>
+          <p class="text-xs text-warm-gray mt-1">Beers On Tap</p>
+        </div>
+        <div class="rounded-lg bg-dark border border-warm-gray/20 p-4 text-center">
+          <p class="text-2xl font-bold text-amber">Full</p>
+          <p class="text-xs text-warm-gray mt-1">AV & Sound</p>
+        </div>
+      </div>
 
       <form id="event-form" class="space-y-4">
         <div class="grid sm:grid-cols-2 gap-4">
@@ -244,13 +260,13 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
           <p class="text-warm-light text-lg mb-4">{SITE.address}</p>
           <p class="text-warm-gray text-sm mb-1">Walk-ins welcome. No reservations needed for the taproom.</p>
           <p class="text-warm-gray text-sm mb-6">Dogs welcome on the patio. Kids welcome until 8pm.</p>
-          <div class="space-y-1 text-sm text-warm-gray">
-            <p><span class="text-warm-light font-medium">Tue–Wed:</span> 4pm–10pm</p>
-            <p><span class="text-warm-light font-medium">Thu:</span> 4pm–11pm</p>
-            <p><span class="text-warm-light font-medium">Fri:</span> 2pm–12am</p>
-            <p><span class="text-warm-light font-medium">Sat:</span> 12pm–12am</p>
-            <p><span class="text-warm-light font-medium">Sun:</span> 12pm–8pm</p>
-            <p><span class="text-warm-light font-medium">Mon:</span> Closed</p>
+          <div class="space-y-1.5 text-sm" style="font-family: system-ui, -apple-system, sans-serif;">
+            <div class="flex justify-between"><span class="text-warm-light font-medium">Tuesday – Wednesday</span><span class="text-warm-gray">4pm – 10pm</span></div>
+            <div class="flex justify-between"><span class="text-warm-light font-medium">Thursday</span><span class="text-warm-gray">4pm – 11pm</span></div>
+            <div class="flex justify-between"><span class="text-warm-light font-medium">Friday</span><span class="text-warm-gray">2pm – 12am</span></div>
+            <div class="flex justify-between"><span class="text-warm-light font-medium">Saturday</span><span class="text-warm-gray">12pm – 12am</span></div>
+            <div class="flex justify-between"><span class="text-warm-light font-medium">Sunday</span><span class="text-warm-gray">12pm – 8pm</span></div>
+            <div class="flex justify-between"><span class="text-warm-light font-medium">Monday</span><span class="text-warm-gray/60">Closed</span></div>
           </div>
           <div class="mt-6">
             <a href={`tel:${SITE.phone}`} class="text-amber hover:text-amber-light">{SITE.phone}</a>
