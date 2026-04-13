@@ -6,6 +6,7 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
 <Layout>
   <!-- Hero -->
   <section class="relative h-[70vh] flex items-center justify-center overflow-hidden">
+    <!-- TODO: Replace with a brewery/taproom hero image — current Unsplash photo may not match -->
     <img src="https://images.unsplash.com/photo-1559526324-593bc073d938?w=1600&q=80" alt="Brewery taproom" class="absolute inset-0 w-full h-full object-cover brightness-[0.3]" loading="eager" />
     <div class="relative text-center px-6">
       <h1 class="text-5xl md:text-7xl font-bold text-cream tracking-tight">{SITE.name}</h1>
@@ -88,12 +89,12 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <section id="merch" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-4xl">
       <h2 class="text-3xl font-bold text-amber text-center mb-3">Merch</h2>
-      <p class="text-center text-warm-gray text-sm mb-10">Rep the Rail. All merch ships free within SC.</p>
+      <p class="text-center text-warm-gray text-sm mb-10">Rep the Copper Rail. All merch ships free within SC.</p>
       <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=400&q=80" alt="Brewery t-shirt" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
-            <p class="font-medium text-warm-light text-sm">Iron Rail Logo Tee</p>
+            <p class="font-medium text-warm-light text-sm">Copper Rail Logo Tee</p>
             <p class="text-amber text-sm font-bold mt-1">$28</p>
           </div>
         </div>
@@ -107,7 +108,7 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1577003811926-53b288a6e5d0?w=400&q=80" alt="Pint glass" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
-            <p class="font-medium text-warm-light text-sm">Iron Rail Pint Glass</p>
+            <p class="font-medium text-warm-light text-sm">Copper Rail Pint Glass</p>
             <p class="text-amber text-sm font-bold mt-1">$12</p>
           </div>
         </div>
@@ -127,23 +128,23 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <section id="find-our-beer" class="py-20 px-6">
     <div class="mx-auto max-w-3xl text-center">
       <h2 class="text-3xl font-bold text-amber mb-3">Find Our Beer</h2>
-      <p class="text-warm-gray text-sm mb-8">Can't make it to the taproom? Find Iron Rail at these locations.</p>
+      <p class="text-warm-gray text-sm mb-8">Can't make it to the taproom? Find Copper Rail at these locations.</p>
       <div class="grid sm:grid-cols-2 gap-3 text-left">
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">GreenVille Beer Exchange</p>
-          <p class="text-xs text-warm-gray">24 S Main St — Growler fills + cans</p>
+          <p class="font-medium text-warm-light text-sm">Upstate Bottle Shop</p>
+          <p class="text-xs text-warm-gray">150 Craft Ave — Growler fills + cans</p>
         </div>
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">Whole Foods Market</p>
-          <p class="text-xs text-warm-gray">1140 Woodruff Rd — 6-packs</p>
+          <p class="font-medium text-warm-light text-sm">Greenville Provisions</p>
+          <p class="text-xs text-warm-gray">88 Market Row — 6-packs</p>
         </div>
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">The Publican</p>
-          <p class="text-xs text-warm-gray">300 Augusta St — Draft only</p>
+          <p class="font-medium text-warm-light text-sm">The Local Pour</p>
+          <p class="text-xs text-warm-gray">300 Hop Street — Draft only</p>
         </div>
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">Community Tap</p>
-          <p class="text-xs text-warm-gray">217 Greenville St, Pendleton — Cans + draft</p>
+          <p class="font-medium text-warm-light text-sm">Trail's End Taphouse</p>
+          <p class="text-xs text-warm-gray">55 Brewery Rd — Cans + draft</p>
         </div>
       </div>
     </div>

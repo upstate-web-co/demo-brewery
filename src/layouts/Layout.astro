@@ -7,7 +7,7 @@ interface Props {
   description?: string
 }
 
-const { title = `${SITE.name} — ${SITE.tagline}`, description = `${SITE.tagline} Craft brewery and taproom in Greenville, SC.` } = Astro.props
+const { title = `${SITE.name} — ${SITE.tagline}`, description = `Portfolio demo — a fictional craft brewery site built by Upstate Web Co.` } = Astro.props
 ---
 
 <!doctype html>
@@ -17,6 +17,7 @@ const { title = `${SITE.name} — ${SITE.tagline}`, description = `${SITE.taglin
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  <meta name="robots" content="noindex, nofollow" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -44,7 +45,7 @@ const { title = `${SITE.name} — ${SITE.tagline}`, description = `${SITE.taglin
   <!-- Demo Disclaimer -->
   <div class="bg-yellow-50 border-y border-yellow-200 py-3 px-6 text-center">
     <p class="text-xs text-yellow-800">
-      <strong>Portfolio Demo</strong> — This is a sample site built by <a href="https://upstate-web.com" class="underline hover:text-yellow-900">Upstate Web Co</a> to showcase what we build for this industry. This is not a real business.
+      <strong>Portfolio Demo</strong> — This is a fictional business created by <a href="https://upstate-web.com" class="underline hover:text-yellow-900">Upstate Web Co</a>. All names, addresses, and details are entirely fictional. Not a real brewery.
     </p>
   </div>
 

@@ -1,10 +1,10 @@
 export const SITE = {
-  name: 'Iron Rail Brewing',
+  name: 'Copper Rail Brewing Co',
   tagline: 'Craft beer. Live music. Good people.',
-  url: 'https://ironrailbrewing.com',
-  email: 'hello@ironrailbrewing.com',
+  url: 'https://copperrailbrewing.com',
+  email: 'hello@copperrailbrewing.com',
   phone: '(864) 555-2739',
-  address: '412 S Main St, Greenville, SC 29601',
+  address: '250 Brewery Lane, Greenville, SC 29601',
   hours: {
     mon: 'Closed',
     tue: '4pm – 10pm',
@@ -23,7 +23,7 @@ export const BRAND = {
 } as const
 
 export const TAP_LIST = [
-  { name: 'Iron Horse IPA', style: 'West Coast IPA', abv: '6.8%', status: 'pouring' },
+  { name: 'Copper Horse IPA', style: 'West Coast IPA', abv: '6.8%', status: 'pouring' },
   { name: 'Switchback Stout', style: 'Oatmeal Stout', abv: '5.4%', status: 'pouring' },
   { name: 'Railyard Red', style: 'Irish Red Ale', abv: '5.1%', status: 'pouring' },
   { name: 'Depot Wheat', style: 'American Wheat', abv: '4.6%', status: 'pouring' },
