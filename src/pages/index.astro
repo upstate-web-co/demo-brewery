@@ -114,8 +114,8 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
             <p class="font-medium text-warm-light text-sm">Copper Rail Logo Tee</p>
             <div class="flex items-center justify-between mt-1">
               <p class="text-amber text-sm font-bold">$28</p>
-              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
             </div>
+            <button data-add-item data-name="Copper Rail Logo Tee" data-price="28" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
@@ -124,8 +124,8 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
             <p class="font-medium text-warm-light text-sm">Snapback Hat</p>
             <div class="flex items-center justify-between mt-1">
               <p class="text-amber text-sm font-bold">$32</p>
-              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
             </div>
+            <button data-add-item data-name="Snapback Hat" data-price="32" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
@@ -134,8 +134,8 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
             <p class="font-medium text-warm-light text-sm">Copper Rail Pint Glass</p>
             <div class="flex items-center justify-between mt-1">
               <p class="text-amber text-sm font-bold">$12</p>
-              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
             </div>
+            <button data-add-item data-name="Copper Rail Pint Glass" data-price="12" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
@@ -144,8 +144,8 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
             <p class="font-medium text-warm-light text-sm">Pullover Hoodie</p>
             <div class="flex items-center justify-between mt-1">
               <p class="text-amber text-sm font-bold">$48</p>
-              <span class="text-xs text-warm-gray bg-warm-gray/10 px-2 py-0.5 rounded-full">In-Store</span>
             </div>
+            <button data-add-item data-name="Pullover Hoodie" data-price="48" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
       </div>
@@ -263,6 +263,19 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
       </div>
     </div>
   </section>
+
+  <script>
+    document.querySelectorAll('[data-add-item]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLElement;
+        const name = el.dataset.name!;
+        const price = el.dataset.price!;
+        (window as any).addToCart(name, price);
+        el.textContent = 'Added!';
+        setTimeout(() => { el.textContent = el.dataset.label || 'Add to Cart'; }, 1000);
+      });
+    });
+  </script>
 
   <script>
     // Tap list expand/collapse
