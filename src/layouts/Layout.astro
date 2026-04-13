@@ -20,6 +20,7 @@ const { title = `${SITE.name} — ${SITE.tagline}`, description = `Portfolio dem
   <meta name="robots" content="noindex, nofollow" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200<meta property="og:description" content={description} />q=80" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://images.unsplash.com" />
 </head>
@@ -35,8 +36,28 @@ const { title = `${SITE.name} — ${SITE.tagline}`, description = `Portfolio dem
         <a href="#visit" class="text-warm-light/70 hover:text-amber transition-colors">Visit</a>
         <a href="#contact" class="rounded-lg bg-amber px-4 py-2 font-medium text-dark hover:bg-amber-light transition-colors">Book the Taproom</a>
       </div>
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="md:hidden text-amber p-2" aria-label="Open menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile menu overlay -->
+  <div id="mobile-menu" class="fixed inset-0 z-[60] bg-dark/95 backdrop-blur-sm hidden flex-col items-center justify-center gap-6 text-lg">
+    <button id="mobile-menu-close" class="absolute top-6 right-6 text-amber p-2" aria-label="Close menu">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <a href="#taplist" class="text-warm-light/70 hover:text-amber transition-colors">On Tap</a>
+    <a href="#events" class="text-warm-light/70 hover:text-amber transition-colors">Events</a>
+    <a href="#private-events" class="text-warm-light/70 hover:text-amber transition-colors">Private Events</a>
+    <a href="#visit" class="text-warm-light/70 hover:text-amber transition-colors">Visit</a>
+    <a href="#contact" class="rounded-lg bg-amber px-5 py-3 font-medium text-dark hover:bg-amber-light transition-colors">Book the Taproom</a>
+  </div>
 
   <main class="pt-16">
     <slot />
@@ -82,5 +103,14 @@ const { title = `${SITE.name} — ${SITE.tagline}`, description = `Portfolio dem
   </footer>
 
   <!-- Inline AI: contextual search bar on homepage, not a floating bubble -->
+
+  <script>
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    const close = document.getElementById('mobile-menu-close');
+    btn?.addEventListener('click', () => menu?.classList.replace('hidden', 'flex'));
+    close?.addEventListener('click', () => menu?.classList.replace('flex', 'hidden'));
+    menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu?.classList.replace('flex', 'hidden')));
+  </script>
 </body>
 </html>
