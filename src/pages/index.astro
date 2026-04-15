@@ -1,12 +1,28 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { SITE, TAP_LIST, EVENTS } from '../lib/config'
+
+// Open Now detection
+const now = new Date()
+const dayIndex = now.getDay() // 0=Sun
+const hour = now.getHours()
+const dayMap: Record<number, string> = { 0: 'sun', 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: 'sat' }
+const todayKey = dayMap[dayIndex]
+const todayHours = SITE.hours[todayKey as keyof typeof SITE.hours]
+const isOpen = todayHours !== 'Closed' && (() => {
+  const match = todayHours.match(/(\d+)(am|pm)\s*[–-]\s*(\d+)(am|pm)/)
+  if (!match) return false
+  let openH = parseInt(match[1]); if (match[2] === 'pm' && openH !== 12) openH += 12
+  let closeH = parseInt(match[3]); if (match[4] === 'pm' && closeH !== 12) closeH += 12
+  if (closeH === 0) closeH = 24 // 12am = midnight
+  return hour >= openH && hour < closeH
+})()
 ---
 
 <Layout>
   <!-- Hero -->
   <section class="relative h-[70vh] flex items-center justify-center overflow-hidden">
-    <img src="https://images.unsplash.com/photo-1532634922-8fe0b757fb13?w=1200&q=75&auto=format" alt="Brewery interior with copper tanks" class="absolute inset-0 w-full h-full object-cover brightness-[0.3]" loading="eager" width="1200" height="800" fetchpriority="high" />
+    <img src="https://images.unsplash.com/photo-1559526324-593bc073d938?w=1600&q=80" alt="Brewery taproom" class="absolute inset-0 w-full h-full object-cover brightness-[0.3]" loading="eager" />
     <div class="relative text-center px-6">
       <h1 class="text-5xl md:text-7xl font-bold text-cream tracking-tight">{SITE.name}</h1>
       <p class="mt-4 text-xl md:text-2xl text-amber-light">{SITE.tagline}</p>
@@ -14,16 +30,32 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
         <a href="#taplist" class="rounded-lg bg-amber px-6 py-3 text-base font-medium text-dark hover:bg-amber-light transition-colors">What's On Tap</a>
         <a href="#private-events" class="rounded-lg border border-amber/50 px-6 py-3 text-base font-medium text-amber hover:bg-amber/10 transition-colors">Book the Taproom</a>
       </div>
+      <div class="mt-8 inline-flex items-center gap-2 bg-dark/50 backdrop-blur-sm rounded-full px-5 py-2">
+        <span class={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
+        <span class="text-sm text-cream/80">{isOpen ? 'Open Now' : 'Closed'} · {todayHours}</span>
+      </div>
     </div>
   </section>
 
-  <!-- AI Chat -->
-  <section class="bg-dark-lighter py-6 px-6">
+  <!-- Inline AI Chat -->
+  <section class="bg-dark-lighter py-8 px-6">
     <div class="mx-auto max-w-xl">
-      <div id="chat-container" class="rounded-lg border border-warm-gray/20 bg-dark overflow-hidden">
+      <div class="flex items-center gap-3 mb-4">
+        <img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=200&q=80" alt="Iron Rail" class="w-12 h-12 rounded-full object-cover border-2 border-amber/30 shadow-sm" />
+        <div>
+          <p class="text-sm font-bold text-warm-light">Ask Iron Rail</p>
+          <p class="text-xs text-warm-gray">Tap list, hours, events, merch, bookings</p>
+        </div>
+      </div>
+      <div class="rounded-xl border border-warm-gray/15 bg-dark overflow-hidden">
         <div id="chat-messages" class="hidden max-h-80 overflow-y-auto px-4 pt-4 pb-2 space-y-3"></div>
-        <div id="chat-input-bar" class="flex gap-2 p-3">
-          <input id="chat-input" type="text" placeholder="What's on tap? Are you open right now? Do you host private events?" class="flex-1 rounded-lg bg-dark-lighter border border-warm-gray/30 px-5 py-2.5 text-sm text-warm-light placeholder:text-warm-gray focus:border-amber focus:outline-none" />
+        <div id="chat-quick" class="flex gap-2 px-3 py-2.5 overflow-x-auto border-b border-warm-gray/10">
+          <button class="chat-q shrink-0 rounded-full border border-amber/25 bg-amber/10 px-3 py-1.5 text-xs font-medium text-amber hover:bg-amber/20 transition-colors" data-msg="What's on tap right now?">🍺 On Tap</button>
+          <button class="chat-q shrink-0 rounded-full border border-amber/25 bg-amber/10 px-3 py-1.5 text-xs font-medium text-amber hover:bg-amber/20 transition-colors" data-msg="What events do you have this week?">🎵 Events</button>
+          <button class="chat-q shrink-0 rounded-full border border-amber/25 bg-amber/10 px-3 py-1.5 text-xs font-medium text-amber hover:bg-amber/20 transition-colors" data-msg="What are your hours?">🕐 Hours</button>
+        </div>
+        <div class="flex gap-2 p-3">
+          <input id="chat-input" type="text" placeholder="Ask about beers, events, hours..." maxlength="500" autocomplete="off" class="flex-1 rounded-lg bg-dark-lighter border border-warm-gray/20 px-5 py-2.5 text-sm text-warm-light placeholder:text-warm-gray focus:border-amber focus:outline-none" />
           <button id="chat-send" class="rounded-lg bg-amber px-5 py-2.5 text-sm font-medium text-dark hover:bg-amber-light transition-colors">Ask</button>
         </div>
       </div>
@@ -33,29 +65,23 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <!-- Tap List -->
   <section id="taplist" class="py-20 px-6">
     <div class="mx-auto max-w-4xl">
-      <h2 class="text-3xl font-bold text-amber text-center mb-2">On Tap Now</h2>
+      <h2 class="reveal text-3xl font-bold text-amber text-center mb-2">On Tap Now</h2>
       <p class="text-center text-warm-gray text-sm mb-10">Updated live. What you see is what's pouring.</p>
       <div class="grid gap-3">
-        {TAP_LIST.map((beer, i) => (
-          <div class={`rounded-lg border ${beer.status === 'low' ? 'border-amber/50 bg-amber/5' : 'border-warm-gray/20 bg-dark-lighter'}`}>
-            <div class="flex items-center justify-between px-5 py-4 cursor-pointer select-none" data-tap-toggle={i}>
-              <div>
-                <h3 class="font-bold text-warm-light">{beer.name}</h3>
-                <p class="text-sm text-warm-gray">{beer.style}</p>
-              </div>
-              <div class="flex items-center gap-4">
-                <span class="text-sm font-mono text-amber">{beer.abv}</span>
-                {beer.status === 'low' && <span class="text-xs bg-amber/20 text-amber px-2 py-0.5 rounded-full">Last Keg</span>}
-                <span class="text-warm-gray text-xs transition-transform" data-tap-arrow={i}>&#9662;</span>
-              </div>
+        {TAP_LIST.map((beer) => (
+          <div class={`flex items-center justify-between rounded-lg border px-5 py-4 ${beer.status === 'low' ? 'border-amber/50 bg-amber/5' : 'border-warm-gray/20 bg-dark-lighter'}`}>
+            <div>
+              <h3 class="font-bold text-warm-light">{beer.name}</h3>
+              <p class="text-sm text-warm-gray">{beer.style}</p>
             </div>
-            <div class="hidden px-5 pb-4" data-tap-detail={i}>
-              <div class="border-t border-warm-gray/15 pt-3 flex flex-wrap gap-4 text-sm">
-                <span class="text-warm-gray"><span class="text-warm-light font-medium">ABV:</span> {beer.abv}</span>
-                <span class="text-warm-gray"><span class="text-warm-light font-medium">IBU:</span> {beer.ibu}</span>
-                <span class="text-warm-gray"><span class="text-warm-light font-medium">Style:</span> {beer.style}</span>
+            <div class="flex items-center gap-4">
+              <div class="hidden sm:block w-16">
+                <div class="w-full h-1.5 bg-warm-gray/20 rounded-full overflow-hidden">
+                  <div class={`h-full rounded-full ${parseFloat(beer.abv) > 8 ? 'bg-red-500' : parseFloat(beer.abv) > 6 ? 'bg-amber' : 'bg-amber-light'}`} style={`width: ${Math.min((parseFloat(beer.abv) / 12) * 100, 100)}%`}></div>
+                </div>
               </div>
-              <p class="text-sm text-warm-gray mt-2 leading-relaxed">{beer.notes}</p>
+              <span class="text-sm font-mono text-amber">{beer.abv}</span>
+              {beer.status === 'low' && <span class="text-xs bg-amber/20 text-amber px-2 py-0.5 rounded-full">Last Keg</span>}
             </div>
           </div>
         ))}
@@ -66,23 +92,16 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <!-- Events -->
   <section id="events" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-4xl">
-      <h2 class="text-3xl font-bold text-amber text-center mb-10">What's Happening</h2>
+      <h2 class="reveal text-3xl font-bold text-amber text-center mb-10">What's Happening</h2>
       <div class="grid md:grid-cols-2 gap-4">
-        {EVENTS.map((event, i) => (
-          <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
-            <div class="p-6 cursor-pointer select-none" data-event-toggle={i}>
-              <div class="flex items-start justify-between mb-3">
-                <h3 class="font-bold text-warm-light text-lg">{event.name}</h3>
-                <span class="text-xs bg-amber/20 text-amber px-2 py-1 rounded-full whitespace-nowrap">{event.time}</span>
-              </div>
-              <p class="text-sm text-amber">{event.day}</p>
+        {EVENTS.map((event) => (
+          <div class="rounded-xl border border-warm-gray/20 bg-dark p-6 transition-all duration-300 hover:-translate-y-1 hover:border-amber/25 hover:shadow-lg">
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-bold text-warm-light text-lg">{event.name}</h3>
+              <span class="text-xs bg-amber/20 text-amber px-2 py-1 rounded-full whitespace-nowrap">{event.time}</span>
             </div>
-            <div class="hidden px-6 pb-6" data-event-detail={i}>
-              <div class="border-t border-warm-gray/15 pt-3">
-                <p class="text-sm text-warm-gray">{event.description}</p>
-                <a href="#private-events" class="inline-block mt-3 text-xs text-amber hover:text-amber-light transition-colors">Book this event &rarr;</a>
-              </div>
-            </div>
+            <p class="text-sm text-amber mb-2">{event.day}</p>
+            <p class="text-sm text-warm-gray">{event.description}</p>
           </div>
         ))}
       </div>
@@ -92,14 +111,14 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <!-- Gallery -->
   <section class="py-20 px-6">
     <div class="mx-auto max-w-6xl">
-      <h2 class="text-3xl font-bold text-amber text-center mb-10">The Taproom</h2>
+      <h2 class="reveal text-3xl font-bold text-amber text-center mb-10">The Taproom</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <img src="https://images.unsplash.com/photo-1555658636-6e4a36218be7?w=600&q=80" alt="Beer taps at the bar" class="rounded-lg aspect-square object-cover" loading="lazy" />
-        <img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&q=80" alt="Taproom interior" class="rounded-lg aspect-square object-cover" loading="lazy" />
-        <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&q=80" alt="Craft beer flight" class="rounded-lg aspect-square object-cover" loading="lazy" />
-        <img src="https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?w=600&q=80" alt="Brewery equipment" class="rounded-lg aspect-square object-cover" loading="lazy" />
-        <img src="https://images.unsplash.com/photo-1584225064536-d0fbc0a10f18?w=600&q=80" alt="People at taproom" class="rounded-lg aspect-square object-cover" loading="lazy" />
-        <img src="https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=600&q=80" alt="Beer pouring" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1532634922-8fe0b757fb13?w=600&q=80" alt="Beer taps" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
+        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&q=80" alt="Taproom interior" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
+        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&q=80" alt="Craft beer flight" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
+        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1504735217152-b768bcab5ebc?w=600&q=80" alt="Brewery bar" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
+        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1584225064536-d0fbc0a10f18?w=600&q=80" alt="People at taproom" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
+        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=600&q=80" alt="Beer pouring" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
       </div>
     </div>
   </section>
@@ -107,75 +126,75 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <!-- Merch Shop -->
   <section id="merch" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-4xl">
-      <h2 class="text-3xl font-bold text-amber text-center mb-3">Merch</h2>
-      <p class="text-center text-warm-gray text-sm mb-10">Rep the Copper Rail. All merch ships free within SC.</p>
+      <h2 class="reveal text-3xl font-bold text-amber text-center mb-3">Merch</h2>
+      <p class="text-center text-warm-gray text-sm mb-10">Rep the Rail. All merch ships free within SC.</p>
       <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=400&q=80" alt="Brewery t-shirt" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
-            <p class="font-medium text-warm-light text-sm">Copper Rail Logo Tee</p>
-            <div class="flex items-center justify-between mt-1">
+            <p class="font-medium text-warm-light text-sm">Iron Rail Logo Tee</p>
+            <div class="flex items-center justify-between mt-2">
               <p class="text-amber text-sm font-bold">$28</p>
+              <button onclick="window.__addToCart('Iron Rail Logo Tee', '$28')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
             </div>
-            <button data-add-item data-name="Copper Rail Logo Tee" data-price="28" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80" alt="Brewery hat" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Snapback Hat</p>
-            <div class="flex items-center justify-between mt-1">
+            <div class="flex items-center justify-between mt-2">
               <p class="text-amber text-sm font-bold">$32</p>
+              <button onclick="window.__addToCart('Snapback Hat', '$32')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
             </div>
-            <button data-add-item data-name="Snapback Hat" data-price="32" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&q=80" alt="Beer pint glass" class="aspect-square object-cover w-full" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1577003811926-53b288a6e5d0?w=400&q=80" alt="Pint glass" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
-            <p class="font-medium text-warm-light text-sm">Copper Rail Pint Glass</p>
-            <div class="flex items-center justify-between mt-1">
+            <p class="font-medium text-warm-light text-sm">Iron Rail Pint Glass</p>
+            <div class="flex items-center justify-between mt-2">
               <p class="text-amber text-sm font-bold">$12</p>
+              <button onclick="window.__addToCart('Iron Rail Pint Glass', '$12')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
             </div>
-            <button data-add-item data-name="Copper Rail Pint Glass" data-price="12" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&q=80" alt="Brewery hoodie" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Pullover Hoodie</p>
-            <div class="flex items-center justify-between mt-1">
+            <div class="flex items-center justify-between mt-2">
               <p class="text-amber text-sm font-bold">$48</p>
+              <button onclick="window.__addToCart('Pullover Hoodie', '$48')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
             </div>
-            <button data-add-item data-name="Pullover Hoodie" data-price="48" data-label="Add to Cart" class="mt-2 w-full rounded-lg bg-amber/20 text-amber text-xs font-bold px-3 py-1.5 hover:bg-amber/30 transition-colors">Add to Cart</button>
           </div>
         </div>
       </div>
-      <p class="text-center text-warm-gray text-xs mt-6">All merch available at the taproom. Stop by and grab yours.</p>
+      <p class="text-center text-warm-gray text-xs mt-6">Online ordering coming soon. Available in the taproom now.</p>
     </div>
   </section>
 
   <!-- Beer Finder -->
   <section id="find-our-beer" class="py-20 px-6">
     <div class="mx-auto max-w-3xl text-center">
-      <h2 class="text-3xl font-bold text-amber mb-3">Find Our Beer</h2>
-      <p class="text-warm-gray text-sm mb-8">Can't make it to the taproom? Find Copper Rail at these locations.</p>
+      <h2 class="reveal text-3xl font-bold text-amber mb-3">Find Our Beer</h2>
+      <p class="text-warm-gray text-sm mb-8">Can't make it to the taproom? Find Iron Rail at these locations.</p>
       <div class="grid sm:grid-cols-2 gap-3 text-left">
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">Upstate Bottle Shop</p>
-          <p class="text-xs text-warm-gray">150 Craft Ave — Growler fills + cans</p>
+          <p class="font-medium text-warm-light text-sm">GreenVille Beer Exchange</p>
+          <p class="text-xs text-warm-gray">24 S Main St — Growler fills + cans</p>
         </div>
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">Greenville Provisions</p>
-          <p class="text-xs text-warm-gray">88 Market Row — 6-packs</p>
+          <p class="font-medium text-warm-light text-sm">Whole Foods Market</p>
+          <p class="text-xs text-warm-gray">1140 Woodruff Rd — 6-packs</p>
         </div>
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">The Local Pour</p>
-          <p class="text-xs text-warm-gray">300 Hop Street — Draft only</p>
+          <p class="font-medium text-warm-light text-sm">The Publican</p>
+          <p class="text-xs text-warm-gray">300 Augusta St — Draft only</p>
         </div>
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
-          <p class="font-medium text-warm-light text-sm">Trail's End Taphouse</p>
-          <p class="text-xs text-warm-gray">55 Brewery Rd — Cans + draft</p>
+          <p class="font-medium text-warm-light text-sm">Community Tap</p>
+          <p class="text-xs text-warm-gray">217 Greenville St, Pendleton — Cans + draft</p>
         </div>
       </div>
     </div>
@@ -184,24 +203,8 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <!-- Private Events -->
   <section id="private-events" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-2xl">
-      <h2 class="text-3xl font-bold text-amber text-center mb-3">Book the Taproom</h2>
-      <p class="text-center text-warm-gray text-sm mb-6">Birthdays, corporate events, rehearsal dinners, release parties. Capacity: 80 seated, 120 standing.</p>
-
-      <!-- Highlights -->
-      <div class="grid grid-cols-3 gap-3 mb-10">
-        <div class="rounded-lg bg-dark border border-warm-gray/20 p-4 text-center">
-          <p class="text-2xl font-bold text-amber">120</p>
-          <p class="text-xs text-warm-gray mt-1">Max Capacity</p>
-        </div>
-        <div class="rounded-lg bg-dark border border-warm-gray/20 p-4 text-center">
-          <p class="text-2xl font-bold text-amber">8</p>
-          <p class="text-xs text-warm-gray mt-1">Beers On Tap</p>
-        </div>
-        <div class="rounded-lg bg-dark border border-warm-gray/20 p-4 text-center">
-          <p class="text-2xl font-bold text-amber">Full</p>
-          <p class="text-xs text-warm-gray mt-1">AV & Sound</p>
-        </div>
-      </div>
+      <h2 class="reveal text-3xl font-bold text-amber text-center mb-3">Book the Taproom</h2>
+      <p class="text-center text-warm-gray text-sm mb-10">Birthdays, corporate events, rehearsal dinners, release parties. Capacity: 80 seated, 120 standing.</p>
 
       <form id="event-form" class="space-y-4">
         <div class="grid sm:grid-cols-2 gap-4">
@@ -256,19 +259,19 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   <!-- Visit -->
   <section id="visit" class="py-20 px-6">
     <div class="mx-auto max-w-4xl">
-      <h2 class="text-3xl font-bold text-amber text-center mb-10">Visit Us</h2>
+      <h2 class="reveal text-3xl font-bold text-amber text-center mb-10">Visit Us</h2>
       <div class="grid md:grid-cols-2 gap-8 items-center">
         <div>
           <p class="text-warm-light text-lg mb-4">{SITE.address}</p>
           <p class="text-warm-gray text-sm mb-1">Walk-ins welcome. No reservations needed for the taproom.</p>
           <p class="text-warm-gray text-sm mb-6">Dogs welcome on the patio. Kids welcome until 8pm.</p>
-          <div class="space-y-1.5 text-sm" style="font-family: system-ui, -apple-system, sans-serif;">
-            <div class="flex justify-between"><span class="text-warm-light font-medium">Tuesday – Wednesday</span><span class="text-warm-gray">4pm – 10pm</span></div>
-            <div class="flex justify-between"><span class="text-warm-light font-medium">Thursday</span><span class="text-warm-gray">4pm – 11pm</span></div>
-            <div class="flex justify-between"><span class="text-warm-light font-medium">Friday</span><span class="text-warm-gray">2pm – 12am</span></div>
-            <div class="flex justify-between"><span class="text-warm-light font-medium">Saturday</span><span class="text-warm-gray">12pm – 12am</span></div>
-            <div class="flex justify-between"><span class="text-warm-light font-medium">Sunday</span><span class="text-warm-gray">12pm – 8pm</span></div>
-            <div class="flex justify-between"><span class="text-warm-light font-medium">Monday</span><span class="text-warm-gray/60">Closed</span></div>
+          <div class="space-y-1 text-sm text-warm-gray">
+            <p><span class="text-warm-light font-medium">Tue–Wed:</span> 4pm–10pm</p>
+            <p><span class="text-warm-light font-medium">Thu:</span> 4pm–11pm</p>
+            <p><span class="text-warm-light font-medium">Fri:</span> 2pm–12am</p>
+            <p><span class="text-warm-light font-medium">Sat:</span> 12pm–12am</p>
+            <p><span class="text-warm-light font-medium">Sun:</span> 12pm–8pm</p>
+            <p><span class="text-warm-light font-medium">Mon:</span> Closed</p>
           </div>
           <div class="mt-6">
             <a href={`tel:${SITE.phone}`} class="text-amber hover:text-amber-light">{SITE.phone}</a>
@@ -283,39 +286,6 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
   </section>
 
   <script>
-    document.querySelectorAll('[data-add-item]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const el = btn as HTMLElement;
-        const name = el.dataset.name!;
-        const price = el.dataset.price!;
-        (window as any).addToCart(name, price);
-        el.textContent = 'Added!';
-        setTimeout(() => { el.textContent = el.dataset.label || 'Add to Cart'; }, 1000);
-      });
-    });
-  </script>
-
-  <script>
-    // Tap list expand/collapse
-    document.querySelectorAll('[data-tap-toggle]').forEach(el => {
-      el.addEventListener('click', () => {
-        const idx = (el as HTMLElement).dataset.tapToggle
-        const detail = document.querySelector(`[data-tap-detail="${idx}"]`)
-        const arrow = document.querySelector(`[data-tap-arrow="${idx}"]`)
-        if (detail) detail.classList.toggle('hidden')
-        if (arrow) arrow.classList.toggle('rotate-180')
-      })
-    })
-
-    // Events expand/collapse
-    document.querySelectorAll('[data-event-toggle]').forEach(el => {
-      el.addEventListener('click', () => {
-        const idx = (el as HTMLElement).dataset.eventToggle
-        const detail = document.querySelector(`[data-event-detail="${idx}"]`)
-        if (detail) detail.classList.toggle('hidden')
-      })
-    })
-
     document.getElementById('event-form')?.addEventListener('submit', (e) => {
       e.preventDefault()
       const status = document.getElementById('form-status')!
@@ -328,71 +298,41 @@ import { SITE, TAP_LIST, EVENTS } from '../lib/config'
     const chatInput = document.getElementById('chat-input') as HTMLInputElement
     const chatSend = document.getElementById('chat-send')!
     const chatMessages = document.getElementById('chat-messages')!
-    let chatHistory: Array<{ role: string; content: string }> = []
+    const chatQuick = document.getElementById('chat-quick')!
+    const chatHistory: Array<{ role: string; content: string }> = []
     let chatBusy = false
-
-    function addMessage(role: string, text: string) {
+    function escapeHtml(t: string): string { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br />') }
+    function linkify(h: string): string {
+      h = h.replace(/\(864\)\s*555-2739/g, '<a href="tel:+18645552739" class="text-amber underline">(864) 555-2739</a>')
+      h = h.replace(/hello@ironrailbrewing\.com/g, '<a href="mailto:hello@ironrailbrewing.com" class="text-amber underline">hello@ironrailbrewing.com</a>')
+      return h
+    }
+    function addMsg(role: string, text: string) {
       chatMessages.classList.remove('hidden')
-      const wrapper = document.createElement('div')
-      wrapper.className = role === 'user' ? 'flex justify-end' : 'flex justify-start'
+      const el = document.createElement('div'); el.className = role === 'user' ? 'flex justify-end' : 'flex justify-start'
       const bubble = document.createElement('div')
-      bubble.className = role === 'user'
-        ? 'bg-amber text-dark rounded-2xl rounded-br-sm px-4 py-2 max-w-[80%] text-sm font-medium'
-        : 'bg-dark-lighter text-warm-light rounded-2xl rounded-bl-sm px-4 py-2 max-w-[80%] text-sm leading-relaxed border border-warm-gray/15'
-      if (role === 'assistant') {
-        const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-        let html = escaped.replace(/\[\[ADD:([^:]+):([^\]]+)\]\]/g, (_, name, price) => {
-          const safeName = name.replace(/'/g, "\\'")
-          return `<button onclick="(window).addToCart('${safeName}', '${price}')" class="inline-block mt-1 px-3 py-1 rounded-lg bg-amber/20 text-amber text-xs font-bold hover:bg-amber/30 transition-colors">+ Add ${name} to cart</button>`
-        })
-        html = html.replace(/\((\d{3})\)\s*(\d{3})-(\d{4})/g, '<a href="tel:$1$2$3" class="underline">($1) $2-$3</a>')
-        html = html.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a href="mailto:$1" class="underline">$1</a>')
-        bubble.innerHTML = html
-      } else {
-        bubble.textContent = text
-      }
-      wrapper.appendChild(bubble)
-      chatMessages.appendChild(wrapper)
-      chatMessages.scrollTop = chatMessages.scrollHeight
+      bubble.className = role === 'user' ? 'bg-amber/15 text-warm-light rounded-xl rounded-tr-sm px-4 py-2.5 max-w-[80%] text-sm leading-relaxed' : 'bg-dark-lighter text-warm-light rounded-xl rounded-tl-sm px-4 py-2.5 max-w-[80%] text-sm leading-relaxed border border-warm-gray/10'
+      bubble.innerHTML = role === 'user' ? escapeHtml(text) : linkify(escapeHtml(text))
+      el.appendChild(bubble); chatMessages.appendChild(el); chatMessages.scrollTop = chatMessages.scrollHeight
     }
-
     function showTyping() {
-      const el = document.createElement('div')
-      el.id = 'typing-indicator'
-      el.className = 'flex justify-start'
-      el.innerHTML = '<div class="bg-dark-lighter text-warm-gray rounded-2xl rounded-bl-sm px-4 py-2 text-sm border border-warm-gray/15">Thinking...</div>'
-      chatMessages.appendChild(el)
-      chatMessages.scrollTop = chatMessages.scrollHeight
+      const el = document.createElement('div'); el.id = 'typing-indicator'; el.className = 'flex justify-start'
+      el.innerHTML = '<div class="bg-dark-lighter border border-warm-gray/10 rounded-xl rounded-tl-sm px-4 py-2.5"><div class="flex gap-1.5 items-center h-5"><span class="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce"></span><span class="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce" style="animation-delay:.15s"></span><span class="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce" style="animation-delay:.3s"></span></div></div>'
+      chatMessages.appendChild(el); chatMessages.scrollTop = chatMessages.scrollHeight
     }
-
-    async function sendMessage() {
-      const text = chatInput.value.trim()
-      if (!text || chatBusy) return
-      chatBusy = true
-      chatInput.value = ''
-      addMessage('user', text)
-      showTyping()
+    async function sendChat(text: string) {
+      if (!text || chatBusy) return; chatBusy = true; chatInput.value = ''; addMsg('user', text); showTyping()
       try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text, history: chatHistory }),
-        })
-        const data = await res.json()
+        const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, history: chatHistory }) })
         document.getElementById('typing-indicator')?.remove()
-        const reply = data.reply || "Couldn't find an answer — give us a call!"
-        addMessage('assistant', reply)
-        chatHistory.push({ role: 'user', content: text })
-        chatHistory.push({ role: 'assistant', content: reply })
-        if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20)
-      } catch {
-        document.getElementById('typing-indicator')?.remove()
-        addMessage('assistant', 'Something went wrong. Call us at (864) 555-2739!')
-      }
-      chatBusy = false
+        const data = await res.json(); const reply = data.reply || 'Not sure — give us a call at (864) 555-2739!'
+        addMsg('assistant', reply); chatHistory.push({ role: 'user', content: text }); chatHistory.push({ role: 'assistant', content: reply })
+        if (chatHistory.length > 20) chatHistory.splice(0, chatHistory.length - 20)
+      } catch { document.getElementById('typing-indicator')?.remove(); addMsg('assistant', 'Something went wrong. Call us at (864) 555-2739!') }
+      chatBusy = false; chatInput.focus()
     }
-
-    chatSend.addEventListener('click', sendMessage)
-    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage() })
+    chatSend.addEventListener('click', () => sendChat(chatInput.value.trim()))
+    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(chatInput.value.trim()) })
+    document.querySelectorAll('.chat-q').forEach(btn => { btn.addEventListener('click', () => { sendChat((btn as HTMLElement).dataset.msg!); chatQuick.remove() }) })
   </script>
 </Layout>

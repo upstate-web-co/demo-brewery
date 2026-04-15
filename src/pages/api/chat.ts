@@ -21,18 +21,17 @@ MERCH: Logo Tee $28, Snapback Hat $32, Pint Glass $12, Pullover Hoodie $48. Avai
 RULES:
 - Be friendly, casual, and knowledgeable about craft beer
 - Keep answers concise (2-3 sentences max)
-- CONVERSATION STYLE: When gathering information from the user, ask only 2-3 related questions at a time, then wait for their response before asking more. Never list more than 3 questions in a single message. Keep it conversational — like a friendly human, not a form.
 - If asked about food: "We don't have a kitchen, but we have a rotating food truck schedule — usually a truck on Thu-Sun. Check our events for this week's lineup."
 - If asked about something you don't know: "I'm not sure about that — give us a call at ${SITE.phone} or email ${SITE.email} and we'll help you out."
 - Never make up information about beers, events, or policies
-- For private event inquiries, direct them to the booking form on the website
-- When recommending specific merch or beers, include [[ADD:Product Name:Price]] after each recommendation so the user can add it to their cart directly. Example: "Grab a Logo Tee ($28) [[ADD:Logo Tee:28]] — looks great with a cold pint."
-- If a user wants to book a private event, guide them conversationally: ask about the date, group size, and what they're celebrating, then direct them to the booking form. Be proactive: "Want me to help you plan your event?" or "I can walk you through what we offer for private parties."`
+- For private event inquiries, direct them to the booking form on the website`
 
 export async function POST({ request, locals }: APIContext) {
   try {
-    const { message, history = [] } = await request.json() as { message?: string; history?: Array<{ role: string; content: string }> }
-    if (!message || typeof message !== 'string') {
+    const body = await request.json()
+    const message = body.message || ''
+    const history: Array<{role: string; content: string}> = body.history || []
+    if (!message) {
       return Response.json({ reply: 'What can I help you with?' })
     }
 
@@ -75,10 +74,7 @@ export async function POST({ request, locals }: APIContext) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 256,
         system: SYSTEM_PROMPT,
-        messages: [
-          ...history.slice(-20).map(h => ({ role: h.role as 'user' | 'assistant', content: h.content })),
-          { role: 'user' as const, content: message },
-        ],
+        messages: [...history.slice(-18).map((h: {role: string; content: string}) => ({ role: h.role, content: h.content })), { role: 'user', content: message }],
       }),
     })
 

@@ -1,10 +1,10 @@
 export const SITE = {
-  name: 'Copper Rail Brewing Co',
+  name: 'Iron Rail Brewing',
   tagline: 'Craft beer. Live music. Good people.',
-  url: 'https://copperrailbrewing.com',
-  email: 'hello@copperrailbrewing.com',
+  url: 'https://ironrailbrewing.com',
+  email: 'hello@ironrailbrewing.com',
   phone: '(864) 555-2739',
-  address: '250 Brewery Lane, Greenville, SC 29601',
+  address: '412 S Main St, Greenville, SC 29601',
   hours: {
     mon: 'Closed',
     tue: '4pm – 10pm',
@@ -23,14 +23,14 @@ export const BRAND = {
 } as const
 
 export const TAP_LIST = [
-  { name: 'Copper Horse IPA', style: 'West Coast IPA', abv: '6.8%', ibu: 65, status: 'pouring', notes: 'Bright citrus and pine hop character with a clean, dry finish. Our flagship.' },
-  { name: 'Switchback Stout', style: 'Oatmeal Stout', abv: '5.4%', ibu: 30, status: 'pouring', notes: 'Silky smooth with roasted coffee and dark chocolate. Creamy mouthfeel from the oats.' },
-  { name: 'Railyard Red', style: 'Irish Red Ale', abv: '5.1%', ibu: 22, status: 'pouring', notes: 'Toasty caramel malt with a hint of toffee. Easy-drinking and balanced.' },
-  { name: 'Depot Wheat', style: 'American Wheat', abv: '4.6%', ibu: 15, status: 'pouring', notes: 'Light, crisp, and refreshing with subtle citrus notes. Perfect patio beer.' },
-  { name: 'Midnight Express', style: 'Barrel-Aged Imperial Stout', abv: '10.2%', ibu: 55, status: 'pouring', notes: 'Aged 12 months in bourbon barrels. Rich vanilla, oak, and dark fruit. Sip slowly.' },
-  { name: 'Boxcar Blonde', style: 'Kölsch', abv: '4.8%', ibu: 20, status: 'pouring', notes: 'German-style ale, light and crisp with delicate floral hops. Crowd favorite.' },
-  { name: 'Junction Haze', style: 'New England IPA', abv: '7.1%', ibu: 45, status: 'low', notes: 'Juicy tropical fruit — mango, pineapple, peach. Soft, pillowy mouthfeel. Hazy gold.' },
-  { name: 'Signal Light Lager', style: 'Mexican Lager', abv: '4.3%', ibu: 12, status: 'pouring', notes: 'Clean, light-bodied lager with a touch of lime zest. Best with a lime wedge.' },
+  { name: 'Iron Horse IPA', style: 'West Coast IPA', abv: '6.8%', status: 'pouring' },
+  { name: 'Switchback Stout', style: 'Oatmeal Stout', abv: '5.4%', status: 'pouring' },
+  { name: 'Railyard Red', style: 'Irish Red Ale', abv: '5.1%', status: 'pouring' },
+  { name: 'Depot Wheat', style: 'American Wheat', abv: '4.6%', status: 'pouring' },
+  { name: 'Midnight Express', style: 'Barrel-Aged Imperial Stout', abv: '10.2%', status: 'pouring' },
+  { name: 'Boxcar Blonde', style: 'Kölsch', abv: '4.8%', status: 'pouring' },
+  { name: 'Junction Haze', style: 'New England IPA', abv: '7.1%', status: 'low' },
+  { name: 'Signal Light Lager', style: 'Mexican Lager', abv: '4.3%', status: 'pouring' },
 ]
 
 export const EVENTS = [
