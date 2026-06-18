@@ -1,0 +1,136 @@
+---
+import '../styles/global.css'
+import Nav from '../components/Nav.astro'
+import { SITE } from '../lib/config'
+
+interface Props {
+  title?: string
+  description?: string
+  ogImage?: string
+}
+
+const canonicalURL = new URL(Astro.url.pathname, SITE.url)
+
+const {
+  title = `${SITE.name} — Greenville, SC`,
+  description = `${SITE.tagline} Craft brewery and taproom at ${SITE.address}.`,
+  ogImage = 'https://images.unsplash.com/photo-1559526324-593bc073d938?w=1200&q=80',
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL.href} />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL.href} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:site_name" content={SITE.name} />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Fonts: Oswald (headings) + Barlow (body) — swap to prevent FOIT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="preconnect" href="https://images.unsplash.com" />
+
+  <slot name="head" />
+</head>
+<body class="bg-coal text-cream antialiased">
+  <!-- Skip to content — a11y -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-amber focus:px-4 focus:py-2 focus:text-coal focus:font-semibold focus:outline-none">
+    Skip to content
+  </a>
+
+  <Nav />
+
+  <main id="main-content" class="pt-[72px]">
+    <slot />
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slag/15 bg-coal-lighter">
+    <div class="mx-auto max-w-6xl px-6 py-14">
+      <div class="grid md:grid-cols-4 gap-10">
+        <!-- Brand -->
+        <div class="md:col-span-1">
+          <a href="/" class="text-2xl font-heading font-bold text-amber uppercase tracking-widest hover:text-amber-light transition-colors">Clinker</a>
+          <p class="text-sm text-slag mt-3 leading-relaxed">{SITE.footerTagline}</p>
+          <div class="flex gap-4 mt-5">
+            <a href={SITE.social.instagram} target="_blank" rel="noopener" class="text-slag hover:text-amber transition-colors p-1" aria-label="Follow us on Instagram">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
+            <a href={SITE.social.untappd} target="_blank" rel="noopener" class="text-slag hover:text-amber transition-colors p-1" aria-label="Find us on Untappd">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.7 8.5L9.2 4.1c-.3-.5-.9-.7-1.4-.5l-2 .8c-.5.2-.8.8-.6 1.3l2.7 5.1c.2.3.5.5.9.5h.5c.4 0 .7-.2.9-.5l1.5-2.3zm.6 0l1.5 2.3c.2.3.5.5.9.5h.5c.4 0 .7-.2.9-.5l2.7-5.1c.2-.5-.1-1.1-.6-1.3l-2-.8c-.5-.2-1.1 0-1.4.5L12.3 8.5zM12 10.5l-2.3 3.5c-.3.5-.1 1.1.4 1.4l2 1.2c.5.3 1.1.1 1.4-.4l.5-.8.5.8c.3.5.9.7 1.4.4l2-1.2c.5-.3.7-.9.4-1.4L14.3 10.5h-2.3z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Pages -->
+        <nav aria-label="Footer navigation">
+          <p class="font-heading font-semibold text-warm-light uppercase tracking-wider text-sm mb-4">Explore</p>
+          <div class="space-y-2.5 text-sm">
+            <a href="/" class="block text-slag hover:text-amber transition-colors">Home</a>
+            <a href="/about" class="block text-slag hover:text-amber transition-colors">About</a>
+            <a href="/gallery" class="block text-slag hover:text-amber transition-colors">Gallery</a>
+            <a href="/blog" class="block text-slag hover:text-amber transition-colors">Blog</a>
+            <a href="/contact" class="block text-slag hover:text-amber transition-colors">Contact</a>
+          </div>
+        </nav>
+
+        <!-- Hours -->
+        <div>
+          <p class="font-heading font-semibold text-warm-light uppercase tracking-wider text-sm mb-4">Hours</p>
+          <div class="space-y-1.5 text-sm text-slag">
+            <p><span class="text-warm-light/80">Tue–Wed</span> 4pm–10pm</p>
+            <p><span class="text-warm-light/80">Thu</span> 4pm–11pm</p>
+            <p><span class="text-warm-light/80">Fri</span> 2pm–12am</p>
+            <p><span class="text-warm-light/80">Sat</span> 12pm–12am</p>
+            <p><span class="text-warm-light/80">Sun</span> 12pm–8pm</p>
+            <p><span class="text-warm-light/80">Mon</span> Closed</p>
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <p class="font-heading font-semibold text-warm-light uppercase tracking-wider text-sm mb-4">Find Us</p>
+          <address class="not-italic space-y-2.5 text-sm text-slag">
+            <p>{SITE.address}</p>
+            <p><a href={`tel:${SITE.phone}`} class="hover:text-amber transition-colors">{SITE.phone}</a></p>
+            <p><a href={`mailto:${SITE.email}`} class="hover:text-amber transition-colors">{SITE.email}</a></p>
+          </address>
+        </div>
+      </div>
+
+      <div class="mt-10 pt-6 border-t border-slag/15 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slag">
+        <p>&copy; {new Date().getFullYear()} {SITE.name} All rights reserved.</p>
+        <p>Built by <a href="https://upstate-web.com" class="text-amber hover:underline">Upstate Web Co</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll reveal observer -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible') })
+    }, { threshold: 0.08, rootMargin: '-20px' })
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
+  </script>
+</body>
+</html>

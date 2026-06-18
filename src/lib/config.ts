@@ -5,6 +5,26 @@ export const SITE = {
   email: 'hello@ironrailbrewing.com',
   phone: '(864) 555-2739',
   address: '412 S Main St, Greenville, SC 29601',
+  postalAddress: {
+    streetAddress: '412 S Main St',
+    addressLocality: 'Greenville',
+    addressRegion: 'SC',
+    postalCode: '29601',
+    addressCountry: 'US',
+  },
+  geo: { latitude: '34.8483', longitude: '-82.3997' },
+  openingHours: [
+    { dayOfWeek: ['Monday'], opens: '00:00', closes: '00:00' },
+    { dayOfWeek: ['Tuesday', 'Wednesday'], opens: '16:00', closes: '22:00' },
+    { dayOfWeek: ['Thursday'], opens: '16:00', closes: '23:00' },
+    { dayOfWeek: ['Friday'], opens: '14:00', closes: '00:00' },
+    { dayOfWeek: ['Saturday'], opens: '12:00', closes: '00:00' },
+    { dayOfWeek: ['Sunday'], opens: '12:00', closes: '20:00' },
+  ],
+  sameAs: [] as string[],
+  priceRange: '$$',
+  paymentAccepted: ['Cash', 'Credit Card'] as string[],
+  currenciesAccepted: 'USD',
   hours: {
     mon: 'Closed',
     tue: '4pm – 10pm',
@@ -14,6 +34,7 @@ export const SITE = {
     sat: '12pm – 12am',
     sun: '12pm – 8pm',
   },
+  indexable: false,
 } as const
 
 export const BRAND = {

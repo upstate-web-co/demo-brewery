@@ -1,22 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { SITE, TAP_LIST, EVENTS } from '../lib/config'
-
-// Open Now detection
-const now = new Date()
-const dayIndex = now.getDay() // 0=Sun
-const hour = now.getHours()
-const dayMap: Record<number, string> = { 0: 'sun', 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: 'sat' }
-const todayKey = dayMap[dayIndex]
-const todayHours = SITE.hours[todayKey as keyof typeof SITE.hours]
-const isOpen = todayHours !== 'Closed' && (() => {
-  const match = todayHours.match(/(\d+)(am|pm)\s*[–-]\s*(\d+)(am|pm)/)
-  if (!match) return false
-  let openH = parseInt(match[1]); if (match[2] === 'pm' && openH !== 12) openH += 12
-  let closeH = parseInt(match[3]); if (match[4] === 'pm' && closeH !== 12) closeH += 12
-  if (closeH === 0) closeH = 24 // 12am = midnight
-  return hour >= openH && hour < closeH
-})()
 ---
 
 <Layout>
@@ -30,42 +14,24 @@ const isOpen = todayHours !== 'Closed' && (() => {
         <a href="#taplist" class="rounded-lg bg-amber px-6 py-3 text-base font-medium text-dark hover:bg-amber-light transition-colors">What's On Tap</a>
         <a href="#private-events" class="rounded-lg border border-amber/50 px-6 py-3 text-base font-medium text-amber hover:bg-amber/10 transition-colors">Book the Taproom</a>
       </div>
-      <div class="mt-8 inline-flex items-center gap-2 bg-dark/50 backdrop-blur-sm rounded-full px-5 py-2">
-        <span class={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
-        <span class="text-sm text-cream/80">{isOpen ? 'Open Now' : 'Closed'} · {todayHours}</span>
-      </div>
     </div>
   </section>
 
-  <!-- Inline AI Chat -->
-  <section class="bg-dark-lighter py-8 px-6">
+  <!-- Inline AI Ask Bar -->
+  <section class="bg-dark-lighter py-6 px-6">
     <div class="mx-auto max-w-xl">
-      <div class="flex items-center gap-3 mb-4">
-        <img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=200&q=80" alt="Iron Rail" class="w-12 h-12 rounded-full object-cover border-2 border-amber/30 shadow-sm" />
-        <div>
-          <p class="text-sm font-bold text-warm-light">Ask Iron Rail</p>
-          <p class="text-xs text-warm-gray">Tap list, hours, events, merch, bookings</p>
-        </div>
+      <div class="flex gap-2">
+        <input id="ai-ask" type="text" placeholder="What's on tap? Are you open right now? Do you host private events?" class="flex-1 rounded-lg bg-dark border border-warm-gray/30 px-5 py-3 text-sm text-warm-light placeholder:text-warm-gray focus:border-amber focus:outline-none" />
+        <button id="ai-send" class="rounded-lg bg-amber px-5 py-3 text-sm font-medium text-dark hover:bg-amber-light transition-colors">Ask</button>
       </div>
-      <div class="rounded-xl border border-warm-gray/15 bg-dark overflow-hidden">
-        <div id="chat-messages" class="hidden max-h-80 overflow-y-auto px-4 pt-4 pb-2 space-y-3"></div>
-        <div id="chat-quick" class="flex gap-2 px-3 py-2.5 overflow-x-auto border-b border-warm-gray/10">
-          <button class="chat-q shrink-0 rounded-full border border-amber/25 bg-amber/10 px-3 py-1.5 text-xs font-medium text-amber hover:bg-amber/20 transition-colors" data-msg="What's on tap right now?">🍺 On Tap</button>
-          <button class="chat-q shrink-0 rounded-full border border-amber/25 bg-amber/10 px-3 py-1.5 text-xs font-medium text-amber hover:bg-amber/20 transition-colors" data-msg="What events do you have this week?">🎵 Events</button>
-          <button class="chat-q shrink-0 rounded-full border border-amber/25 bg-amber/10 px-3 py-1.5 text-xs font-medium text-amber hover:bg-amber/20 transition-colors" data-msg="What are your hours?">🕐 Hours</button>
-        </div>
-        <div class="flex gap-2 p-3">
-          <input id="chat-input" type="text" placeholder="Ask about beers, events, hours..." maxlength="500" autocomplete="off" class="flex-1 rounded-lg bg-dark-lighter border border-warm-gray/20 px-5 py-2.5 text-sm text-warm-light placeholder:text-warm-gray focus:border-amber focus:outline-none" />
-          <button id="chat-send" class="rounded-lg bg-amber px-5 py-2.5 text-sm font-medium text-dark hover:bg-amber-light transition-colors">Ask</button>
-        </div>
-      </div>
+      <div id="ai-response" class="hidden mt-3 rounded-lg bg-dark border border-warm-gray/20 p-4 text-sm text-warm-light leading-relaxed"></div>
     </div>
   </section>
 
   <!-- Tap List -->
   <section id="taplist" class="py-20 px-6">
     <div class="mx-auto max-w-4xl">
-      <h2 class="reveal text-3xl font-bold text-amber text-center mb-2">On Tap Now</h2>
+      <h2 class="text-3xl font-bold text-amber text-center mb-2">On Tap Now</h2>
       <p class="text-center text-warm-gray text-sm mb-10">Updated live. What you see is what's pouring.</p>
       <div class="grid gap-3">
         {TAP_LIST.map((beer) => (
@@ -75,11 +41,6 @@ const isOpen = todayHours !== 'Closed' && (() => {
               <p class="text-sm text-warm-gray">{beer.style}</p>
             </div>
             <div class="flex items-center gap-4">
-              <div class="hidden sm:block w-16">
-                <div class="w-full h-1.5 bg-warm-gray/20 rounded-full overflow-hidden">
-                  <div class={`h-full rounded-full ${parseFloat(beer.abv) > 8 ? 'bg-red-500' : parseFloat(beer.abv) > 6 ? 'bg-amber' : 'bg-amber-light'}`} style={`width: ${Math.min((parseFloat(beer.abv) / 12) * 100, 100)}%`}></div>
-                </div>
-              </div>
               <span class="text-sm font-mono text-amber">{beer.abv}</span>
               {beer.status === 'low' && <span class="text-xs bg-amber/20 text-amber px-2 py-0.5 rounded-full">Last Keg</span>}
             </div>
@@ -92,10 +53,10 @@ const isOpen = todayHours !== 'Closed' && (() => {
   <!-- Events -->
   <section id="events" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-4xl">
-      <h2 class="reveal text-3xl font-bold text-amber text-center mb-10">What's Happening</h2>
+      <h2 class="text-3xl font-bold text-amber text-center mb-10">What's Happening</h2>
       <div class="grid md:grid-cols-2 gap-4">
         {EVENTS.map((event) => (
-          <div class="rounded-xl border border-warm-gray/20 bg-dark p-6 transition-all duration-300 hover:-translate-y-1 hover:border-amber/25 hover:shadow-lg">
+          <div class="rounded-xl border border-warm-gray/20 bg-dark p-6">
             <div class="flex items-start justify-between mb-3">
               <h3 class="font-bold text-warm-light text-lg">{event.name}</h3>
               <span class="text-xs bg-amber/20 text-amber px-2 py-1 rounded-full whitespace-nowrap">{event.time}</span>
@@ -111,14 +72,14 @@ const isOpen = todayHours !== 'Closed' && (() => {
   <!-- Gallery -->
   <section class="py-20 px-6">
     <div class="mx-auto max-w-6xl">
-      <h2 class="reveal text-3xl font-bold text-amber text-center mb-10">The Taproom</h2>
+      <h2 class="text-3xl font-bold text-amber text-center mb-10">The Taproom</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1532634922-8fe0b757fb13?w=600&q=80" alt="Beer taps" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
-        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&q=80" alt="Taproom interior" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
-        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&q=80" alt="Craft beer flight" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
-        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1504735217152-b768bcab5ebc?w=600&q=80" alt="Brewery bar" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
-        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1584225064536-d0fbc0a10f18?w=600&q=80" alt="People at taproom" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
-        <div class="rounded-lg overflow-hidden"><img src="https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=600&q=80" alt="Beer pouring" class="aspect-square object-cover hover:scale-110 transition-transform duration-500" loading="lazy" /></div>
+        <img src="https://images.unsplash.com/photo-1532634922-8fe0b757fb13?w=600&q=80" alt="Beer taps" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&q=80" alt="Taproom interior" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&q=80" alt="Craft beer flight" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1575037614876-c38a4c44a024?w=600&q=80" alt="Brewery equipment" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1584225064536-d0fbc0a10f18?w=600&q=80" alt="People at taproom" class="rounded-lg aspect-square object-cover" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=600&q=80" alt="Beer pouring" class="rounded-lg aspect-square object-cover" loading="lazy" />
       </div>
     </div>
   </section>
@@ -126,47 +87,35 @@ const isOpen = todayHours !== 'Closed' && (() => {
   <!-- Merch Shop -->
   <section id="merch" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-4xl">
-      <h2 class="reveal text-3xl font-bold text-amber text-center mb-3">Merch</h2>
+      <h2 class="text-3xl font-bold text-amber text-center mb-3">Merch</h2>
       <p class="text-center text-warm-gray text-sm mb-10">Rep the Rail. All merch ships free within SC.</p>
       <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=400&q=80" alt="Brewery t-shirt" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Iron Rail Logo Tee</p>
-            <div class="flex items-center justify-between mt-2">
-              <p class="text-amber text-sm font-bold">$28</p>
-              <button onclick="window.__addToCart('Iron Rail Logo Tee', '$28')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
-            </div>
+            <p class="text-amber text-sm font-bold mt-1">$28</p>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80" alt="Brewery hat" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Snapback Hat</p>
-            <div class="flex items-center justify-between mt-2">
-              <p class="text-amber text-sm font-bold">$32</p>
-              <button onclick="window.__addToCart('Snapback Hat', '$32')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
-            </div>
+            <p class="text-amber text-sm font-bold mt-1">$32</p>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1577003811926-53b288a6e5d0?w=400&q=80" alt="Pint glass" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Iron Rail Pint Glass</p>
-            <div class="flex items-center justify-between mt-2">
-              <p class="text-amber text-sm font-bold">$12</p>
-              <button onclick="window.__addToCart('Iron Rail Pint Glass', '$12')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
-            </div>
+            <p class="text-amber text-sm font-bold mt-1">$12</p>
           </div>
         </div>
         <div class="rounded-xl border border-warm-gray/20 bg-dark overflow-hidden">
           <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&q=80" alt="Brewery hoodie" class="aspect-square object-cover w-full" loading="lazy" />
           <div class="p-4">
             <p class="font-medium text-warm-light text-sm">Pullover Hoodie</p>
-            <div class="flex items-center justify-between mt-2">
-              <p class="text-amber text-sm font-bold">$48</p>
-              <button onclick="window.__addToCart('Pullover Hoodie', '$48')" class="rounded-full bg-amber/20 text-amber px-3 py-1 text-xs font-medium hover:bg-amber/30 transition-colors">Add</button>
-            </div>
+            <p class="text-amber text-sm font-bold mt-1">$48</p>
           </div>
         </div>
       </div>
@@ -177,7 +126,7 @@ const isOpen = todayHours !== 'Closed' && (() => {
   <!-- Beer Finder -->
   <section id="find-our-beer" class="py-20 px-6">
     <div class="mx-auto max-w-3xl text-center">
-      <h2 class="reveal text-3xl font-bold text-amber mb-3">Find Our Beer</h2>
+      <h2 class="text-3xl font-bold text-amber mb-3">Find Our Beer</h2>
       <p class="text-warm-gray text-sm mb-8">Can't make it to the taproom? Find Iron Rail at these locations.</p>
       <div class="grid sm:grid-cols-2 gap-3 text-left">
         <div class="rounded-lg border border-warm-gray/20 bg-dark-lighter px-5 py-4">
@@ -203,7 +152,7 @@ const isOpen = todayHours !== 'Closed' && (() => {
   <!-- Private Events -->
   <section id="private-events" class="py-20 px-6 bg-dark-lighter">
     <div class="mx-auto max-w-2xl">
-      <h2 class="reveal text-3xl font-bold text-amber text-center mb-3">Book the Taproom</h2>
+      <h2 class="text-3xl font-bold text-amber text-center mb-3">Book the Taproom</h2>
       <p class="text-center text-warm-gray text-sm mb-10">Birthdays, corporate events, rehearsal dinners, release parties. Capacity: 80 seated, 120 standing.</p>
 
       <form id="event-form" class="space-y-4">
@@ -259,7 +208,7 @@ const isOpen = todayHours !== 'Closed' && (() => {
   <!-- Visit -->
   <section id="visit" class="py-20 px-6">
     <div class="mx-auto max-w-4xl">
-      <h2 class="reveal text-3xl font-bold text-amber text-center mb-10">Visit Us</h2>
+      <h2 class="text-3xl font-bold text-amber text-center mb-10">Visit Us</h2>
       <div class="grid md:grid-cols-2 gap-8 items-center">
         <div>
           <p class="text-warm-light text-lg mb-4">{SITE.address}</p>
@@ -294,45 +243,30 @@ const isOpen = todayHours !== 'Closed' && (() => {
       ;(e.target as HTMLFormElement).querySelectorAll('input, select, textarea, button').forEach(el => (el as HTMLInputElement).disabled = true)
     })
 
-    // Multi-turn AI chat
-    const chatInput = document.getElementById('chat-input') as HTMLInputElement
-    const chatSend = document.getElementById('chat-send')!
-    const chatMessages = document.getElementById('chat-messages')!
-    const chatQuick = document.getElementById('chat-quick')!
-    const chatHistory: Array<{ role: string; content: string }> = []
-    let chatBusy = false
-    function escapeHtml(t: string): string { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br />') }
-    function linkify(h: string): string {
-      h = h.replace(/\(864\)\s*555-2739/g, '<a href="tel:+18645552739" class="text-amber underline">(864) 555-2739</a>')
-      h = h.replace(/hello@ironrailbrewing\.com/g, '<a href="mailto:hello@ironrailbrewing.com" class="text-amber underline">hello@ironrailbrewing.com</a>')
-      return h
-    }
-    function addMsg(role: string, text: string) {
-      chatMessages.classList.remove('hidden')
-      const el = document.createElement('div'); el.className = role === 'user' ? 'flex justify-end' : 'flex justify-start'
-      const bubble = document.createElement('div')
-      bubble.className = role === 'user' ? 'bg-amber/15 text-warm-light rounded-xl rounded-tr-sm px-4 py-2.5 max-w-[80%] text-sm leading-relaxed' : 'bg-dark-lighter text-warm-light rounded-xl rounded-tl-sm px-4 py-2.5 max-w-[80%] text-sm leading-relaxed border border-warm-gray/10'
-      bubble.innerHTML = role === 'user' ? escapeHtml(text) : linkify(escapeHtml(text))
-      el.appendChild(bubble); chatMessages.appendChild(el); chatMessages.scrollTop = chatMessages.scrollHeight
-    }
-    function showTyping() {
-      const el = document.createElement('div'); el.id = 'typing-indicator'; el.className = 'flex justify-start'
-      el.innerHTML = '<div class="bg-dark-lighter border border-warm-gray/10 rounded-xl rounded-tl-sm px-4 py-2.5"><div class="flex gap-1.5 items-center h-5"><span class="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce"></span><span class="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce" style="animation-delay:.15s"></span><span class="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce" style="animation-delay:.3s"></span></div></div>'
-      chatMessages.appendChild(el); chatMessages.scrollTop = chatMessages.scrollHeight
-    }
-    async function sendChat(text: string) {
-      if (!text || chatBusy) return; chatBusy = true; chatInput.value = ''; addMsg('user', text); showTyping()
+    // Inline AI ask
+    const aiInput = document.getElementById('ai-ask') as HTMLInputElement
+    const aiSend = document.getElementById('ai-send')!
+    const aiResponse = document.getElementById('ai-response')!
+
+    async function askAI() {
+      const text = aiInput.value.trim()
+      if (!text) return
+      aiResponse.textContent = 'Thinking...'
+      aiResponse.classList.remove('hidden')
       try {
-        const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, history: chatHistory }) })
-        document.getElementById('typing-indicator')?.remove()
-        const data = await res.json(); const reply = data.reply || 'Not sure — give us a call at (864) 555-2739!'
-        addMsg('assistant', reply); chatHistory.push({ role: 'user', content: text }); chatHistory.push({ role: 'assistant', content: reply })
-        if (chatHistory.length > 20) chatHistory.splice(0, chatHistory.length - 20)
-      } catch { document.getElementById('typing-indicator')?.remove(); addMsg('assistant', 'Something went wrong. Call us at (864) 555-2739!') }
-      chatBusy = false; chatInput.focus()
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text }),
+        })
+        const data = await res.json()
+        aiResponse.textContent = data.reply || 'Couldn\'t find an answer — give us a call!'
+      } catch {
+        aiResponse.textContent = 'Something went wrong. Call us at (864) 555-2739!'
+      }
     }
-    chatSend.addEventListener('click', () => sendChat(chatInput.value.trim()))
-    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(chatInput.value.trim()) })
-    document.querySelectorAll('.chat-q').forEach(btn => { btn.addEventListener('click', () => { sendChat((btn as HTMLElement).dataset.msg!); chatQuick.remove() }) })
+
+    aiSend.addEventListener('click', askAI)
+    aiInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askAI() })
   </script>
 </Layout>

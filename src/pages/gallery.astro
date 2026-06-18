@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { GALLERY_IMAGES } from '../lib/config'
+---
+
+<BaseLayout title="Gallery — Clinker Brewing Co." description="Photos from inside Clinker Brewing Co. — the taproom, the bar, the Furnace Sessions, and the beer.">
+
+  <!-- Hero banner -->
+  <section class="relative py-28 md:py-36 px-6 overflow-hidden grain">
+    <img
+      src="https://images.unsplash.com/photo-1504735217152-b768bcab5ebc?w=1600&q=80"
+      alt="Clinker Brewing bar"
+      class="absolute inset-0 w-full h-full object-cover brightness-[0.15]"
+      loading="eager"
+    />
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      <h1 class="text-4xl md:text-6xl font-bold text-cream reveal">The Taproom</h1>
+      <hr class="amber-rule reveal delay-1" />
+      <p class="text-warm-light/60 text-lg mt-4 reveal delay-2">
+        Brick, wood, amber light, and whatever band showed up Friday.
+      </p>
+    </div>
+  </section>
+
+  <!-- Gallery Grid -->
+  <section class="py-20 md:py-28 px-6">
+    <div class="mx-auto max-w-6xl">
+      <div class="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+        {GALLERY_IMAGES.map((img, i) => (
+          <div class={`reveal break-inside-avoid rounded-xl overflow-hidden border border-slag/15 group ${i <= 2 ? `delay-${i + 1}` : ''}`}>
+            <div class="relative overflow-hidden">
+              <img
+                src={img.src}
+                alt={img.alt}
+                class="w-full object-cover group-hover:scale-105 transition-transform duration-700"
+                loading={i < 3 ? 'eager' : 'lazy'}
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-coal/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                <p class="text-cream text-sm font-medium p-4">{img.caption}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Additional photos: band-performing, food-truck-saturday, barrel-room, patio-evening -->
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-16 px-6 bg-coal-lighter">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="text-warm-light/70 reveal">Want to see the space in person?</p>
+      <a
+        href="/contact"
+        class="inline-block mt-4 rounded-lg bg-amber px-8 py-3.5 text-base font-semibold text-coal hover:bg-amber-light transition-colors reveal delay-1"
+      >
+        Plan Your Visit
+      </a>
+    </div>
+  </section>
+
+</BaseLayout>

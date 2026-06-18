@@ -1,0 +1,132 @@
+---
+import { SITE } from '../lib/config'
+
+const currentPath = Astro.url.pathname
+
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/contact', label: 'Contact' },
+]
+---
+
+<header>
+  <nav id="main-nav" class="fixed top-0 w-full z-50 bg-coal/95 backdrop-blur-sm border-b border-transparent transition-[border-color,box-shadow] duration-300" aria-label="Main navigation">
+    <div class="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
+      <!-- Logo / Wordmark -->
+      <a href="/" class="flex items-center gap-2 group" aria-label="Clinker Brewing Co. — Home">
+        <span class="text-2xl font-heading font-bold text-amber tracking-widest uppercase group-hover:text-amber-light transition-colors">
+          Clinker
+        </span>
+      </a>
+
+      <!-- Desktop nav -->
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+        {links.map(link => (
+          <a
+            href={link.href}
+            class:list={[
+              'relative py-1 transition-colors',
+              currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
+                ? 'text-amber'
+                : 'text-warm-light/70 hover:text-amber',
+            ]}
+            aria-current={currentPath === link.href ? 'page' : undefined}
+          >
+            {link.label}
+            {(currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))) && (
+              <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber rounded-full" aria-hidden="true" />
+            )}
+          </a>
+        ))}
+      </div>
+
+      <!-- Mobile hamburger — min 44x44 tap target -->
+      <button
+        id="mobile-menu-toggle"
+        class="md:hidden text-warm-light/70 hover:text-amber transition-colors p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+        <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-coal border-t border-slag/20" role="menu">
+      <div class="px-6 py-6 space-y-1">
+        {links.map(link => (
+          <a
+            href={link.href}
+            role="menuitem"
+            class:list={[
+              'block py-3 text-base font-medium border-b border-slag/10 transition-colors',
+              currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
+                ? 'text-amber border-amber/20'
+                : 'text-warm-light/80 hover:text-amber',
+            ]}
+            aria-current={currentPath === link.href ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        ))}
+        <div class="pt-4 flex gap-4">
+          <a href={SITE.social.instagram} target="_blank" rel="noopener" class="text-slag hover:text-amber transition-colors p-1 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Follow us on Instagram">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href={SITE.social.untappd} target="_blank" rel="noopener" class="text-slag hover:text-amber transition-colors p-1 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Find us on Untappd">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.7 8.5L9.2 4.1c-.3-.5-.9-.7-1.4-.5l-2 .8c-.5.2-.8.8-.6 1.3l2.7 5.1c.2.3.5.5.9.5h.5c.4 0 .7-.2.9-.5l1.5-2.3zm.6 0l1.5 2.3c.2.3.5.5.9.5h.5c.4 0 .7-.2.9-.5l2.7-5.1c.2-.5-.1-1.1-.6-1.3l-2-.8c-.5-.2-1.1 0-1.4.5L12.3 8.5zM12 10.5l-2.3 3.5c-.3.5-.1 1.1.4 1.4l2 1.2c.5.3 1.1.1 1.4-.4l.5-.8.5.8c.3.5.9.7 1.4.4l2-1.2c.5-.3.7-.9.4-1.4L14.3 10.5h-2.3z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const nav = document.getElementById('main-nav')!
+  const toggle = document.getElementById('mobile-menu-toggle')!
+  const menu = document.getElementById('mobile-menu')!
+  const iconOpen = document.getElementById('menu-icon-open')!
+  const iconClose = document.getElementById('menu-icon-close')!
+
+  // Scroll shadow
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+      nav.classList.add('border-slag/20', 'shadow-lg', 'shadow-coal/50')
+      nav.classList.remove('border-transparent')
+    } else {
+      nav.classList.remove('border-slag/20', 'shadow-lg', 'shadow-coal/50')
+      nav.classList.add('border-transparent')
+    }
+  }, { passive: true })
+
+  // Mobile toggle
+  toggle.addEventListener('click', () => {
+    const isNowHidden = menu.classList.toggle('hidden')
+    iconOpen.classList.toggle('hidden', !isNowHidden)
+    iconClose.classList.toggle('hidden', isNowHidden)
+    toggle.setAttribute('aria-expanded', String(!isNowHidden))
+    toggle.setAttribute('aria-label', isNowHidden ? 'Open menu' : 'Close menu')
+  })
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.classList.contains('hidden')) {
+      menu.classList.add('hidden')
+      iconOpen.classList.remove('hidden')
+      iconClose.classList.add('hidden')
+      toggle.setAttribute('aria-expanded', 'false')
+      toggle.setAttribute('aria-label', 'Open menu')
+      toggle.focus()
+    }
+  })
+</script>

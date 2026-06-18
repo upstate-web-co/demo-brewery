@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { getCollection, render } from 'astro:content'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog')
+  return posts.map(post => ({ params: { slug: post.id }, props: { post } }))
+}
+
+const { post } = Astro.props
+const { Content } = await render(post)
+
+const formattedDate = new Date(post.data.date).toLocaleDateString('en-US', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+})
+---
+
+<BaseLayout title={`${post.data.title} — Clinker Brewing Co.`} description={post.data.description}>
+
+  <!-- Hero banner -->
+  <section class="relative py-28 md:py-36 px-6 overflow-hidden grain">
+    {post.data.image ? (
+      <img
+        src={post.data.image}
+        alt={post.data.title}
+        class="absolute inset-0 w-full h-full object-cover brightness-[0.15]"
+        loading="eager"
+      />
+    ) : (
+      <div class="absolute inset-0 bg-coal-lighter" />
+    )}
+    <div class="relative z-10 max-w-3xl mx-auto text-center">
+      {post.data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 justify-center mb-4 reveal">
+          {post.data.tags.map((tag: string) => (
+            <span class="text-xs bg-amber/15 text-amber px-3 py-1 rounded-full font-medium uppercase tracking-wider">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+      <h1 class="text-3xl md:text-5xl font-bold text-cream leading-tight reveal delay-1">
+        {post.data.title}
+      </h1>
+      <div class="mt-6 flex items-center justify-center gap-3 text-sm text-slag reveal delay-2">
+        <span>{post.data.author}</span>
+        <span class="text-slag/40" aria-hidden="true">&middot;</span>
+        <time datetime={post.data.date}>{formattedDate}</time>
+      </div>
+    </div>
+  </section>
+
+  <!-- Post content -->
+  <section class="py-16 md:py-24 px-6">
+    <article class="mx-auto max-w-2xl prose-clinker">
+      <Content />
+    </article>
+
+    <!-- Back link -->
+    <div class="mx-auto max-w-2xl mt-16 pt-8 border-t border-slag/15">
+      <a href="/blog" class="inline-flex items-center gap-2 text-amber hover:text-amber-light font-medium transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+        All Posts
+      </a>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style is:global>
+  .prose-clinker {
+    color: #d6d3d1;
+    font-size: 1.0625rem;
+    line-height: 1.8;
+  }
+  .prose-clinker h2 {
+    color: #FAFAF9;
+    font-size: 1.5rem;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .prose-clinker h3 {
+    color: #FAFAF9;
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .prose-clinker p {
+    margin-bottom: 1.25rem;
+  }
+  .prose-clinker strong {
+    color: #F5F5F4;
+    font-weight: 600;
+  }
+  .prose-clinker em {
+    color: #a8a29e;
+  }
+  .prose-clinker a {
+    color: #D97706;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s;
+  }
+  .prose-clinker a:hover {
+    color: #FBBF24;
+  }
+  .prose-clinker ul, .prose-clinker ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  .prose-clinker li {
+    margin-bottom: 0.5rem;
+  }
+  .prose-clinker ul li::marker {
+    color: #D97706;
+  }
+  .prose-clinker ol li::marker {
+    color: #D97706;
+    font-weight: 600;
+  }
+  .prose-clinker hr {
+    border-color: #44403C;
+    margin: 2rem 0;
+  }
+  .prose-clinker blockquote {
+    border-left: 3px solid #D97706;
+    padding-left: 1rem;
+    color: #a8a29e;
+    font-style: italic;
+    margin: 1.5rem 0;
+  }
+</style>

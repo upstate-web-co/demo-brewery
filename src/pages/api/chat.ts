@@ -28,10 +28,8 @@ RULES:
 
 export async function POST({ request, locals }: APIContext) {
   try {
-    const body = await request.json()
-    const message = body.message || ''
-    const history: Array<{role: string; content: string}> = body.history || []
-    if (!message) {
+    const { message } = await request.json()
+    if (!message || typeof message !== 'string') {
       return Response.json({ reply: 'What can I help you with?' })
     }
 
@@ -74,7 +72,7 @@ export async function POST({ request, locals }: APIContext) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 256,
         system: SYSTEM_PROMPT,
-        messages: [...history.slice(-18).map((h: {role: string; content: string}) => ({ role: h.role, content: h.content })), { role: 'user', content: message }],
+        messages: [{ role: 'user', content: message }],
       }),
     })
 
